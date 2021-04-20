@@ -4,6 +4,6 @@ git init
 git diff
 git status
 git log
-git show
+git show head~1 #Versão anterior
 
 
