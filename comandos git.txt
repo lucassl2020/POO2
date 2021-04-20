@@ -9,3 +9,4 @@ git remote add origin https://github.com/lucassl2020/POO2
 git clone https://github.com/lucassl2020/POO2
 git pull origin master
 git push origin master
+git rm arquivo.txt
