@@ -6,7 +6,7 @@ git status
 git log
 git show head~1 #Versão anterior
 git remote add origin https://github.com/lucassl2020/POO2
-git clone https://github.com/lucassl2020/POO2
+git clone https://github.com/lucassl2020/POO2 nome-da-pasta
 git pull origin master
 git push origin master
 git rm arquivo.txt
