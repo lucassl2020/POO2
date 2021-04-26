@@ -17,3 +17,4 @@ git checkout nomeDaBranch #Alterar entre branchs
 git checkout -b nomeDaBranch #Criar branch
 git merge nomeDaBranch #Mesclar a branch atual com a branch passada por parametro
 git rebase nomeDaBranch #Adiciona a branch passada por parametro no topo da branch atual
+a
