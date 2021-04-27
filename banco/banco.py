@@ -139,6 +139,3 @@ if __name__ == "__main__":
     c1.extrato()
 
     c1.falha = False
-
-    
-
