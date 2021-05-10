@@ -1,11 +1,10 @@
 import sys
 
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QApplication, QMessageBox
+from PyQt5.QtWidgets import QMessageBox
 
-from Banco import Banco
+from banco import Banco
 from Cliente import Cliente
-from Historico import Historico
 from Conta import Conta
 from tela_inicial import Tela_Inicial
 from tela_de_cadastro import Tela_Cadastro
