@@ -3,7 +3,7 @@ import sys
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 
-from banco import Banco
+from Banco import Banco
 from Cliente import Cliente
 from Conta import Conta
 from tela_inicial import Tela_Inicial
