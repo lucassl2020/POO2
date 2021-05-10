@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>802</width>
-    <height>586</height>
+    <width>800</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
       <x>0</x>
       <y>0</y>
       <width>801</width>
-      <height>151</height>
+      <height>101</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -32,7 +32,7 @@
     <property name="frameShadow">
      <enum>QFrame::Raised</enum>
     </property>
-    <widget class="QLabel" name="label_4">
+    <widget class="QLabel" name="LEBANK_label">
      <property name="geometry">
       <rect>
        <x>0</x>
@@ -59,14 +59,52 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0.210
       <string>                                                 LEBANK</string>
      </property>
     </widget>
+    <widget class="QLabel" name="saldo_label">
+     <property name="geometry">
+      <rect>
+       <x>580</x>
+       <y>30</y>
+       <width>191</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(255, 255, 0);
+color: rgb(19, 11, 98);</string>
+     </property>
+     <property name="text">
+      <string>Saldo:</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="saldo_line">
+     <property name="geometry">
+      <rect>
+       <x>630</x>
+       <y>30</y>
+       <width>141</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(255, 255, 0);
+color: rgb(23, 14, 121);</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QFrame" name="frame_2">
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>150</y>
+      <y>100</y>
       <width>811</width>
-      <height>211</height>
+      <height>271</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -78,72 +116,41 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0.210
     <property name="frameShadow">
      <enum>QFrame::Raised</enum>
     </property>
-    <widget class="QLineEdit" name="lineEdit">
-     <property name="geometry">
-      <rect>
-       <x>240</x>
-       <y>30</y>
-       <width>391</width>
-       <height>20</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_2">
-     <property name="geometry">
-      <rect>
-       <x>70</x>
-       <y>20</y>
-       <width>131</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-      </font>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">background-color: rgb(255, 255, 255);</string>
-     </property>
-     <property name="text">
-      <string>Número da conta:</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_3">
-     <property name="geometry">
-      <rect>
-       <x>150</x>
-       <y>80</y>
-       <width>91</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-      </font>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">background-color: rgb(255, 255, 255);</string>
-     </property>
-     <property name="text">
-      <string>Senha:</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="lineEdit_2">
-     <property name="geometry">
-      <rect>
-       <x>240</x>
-       <y>90</y>
-       <width>391</width>
-       <height>20</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="pushButton">
+    <widget class="QLineEdit" name="valor_a_ser_sacado_line">
      <property name="geometry">
       <rect>
        <x>290</x>
+       <y>70</y>
+       <width>221</width>
+       <height>20</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="valor_a_ser_sacado_label">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>60</y>
+       <width>161</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(255, 255, 255);</string>
+     </property>
+     <property name="text">
+      <string>Valor à ser sacado:</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="confirmar_botao">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
        <y>140</y>
        <width>211</width>
        <height>51</height>
@@ -153,17 +160,33 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0.210
       <string notr="true">background-color: rgb(255, 255, 0);</string>
      </property>
      <property name="text">
-      <string>Logar</string>
+      <string>CONFIRMAR</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="voltar_botao">
+     <property name="geometry">
+      <rect>
+       <x>420</x>
+       <y>140</y>
+       <width>211</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(255, 255, 0);</string>
+     </property>
+     <property name="text">
+      <string>VOLTAR</string>
      </property>
     </widget>
    </widget>
    <widget class="QFrame" name="frame_3">
     <property name="geometry">
      <rect>
-      <x>-10</x>
+      <x>0</x>
       <y>370</y>
       <width>811</width>
-      <height>221</height>
+      <height>201</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -183,7 +206,7 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0.210
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>802</width>
+     <width>800</width>
      <height>21</height>
     </rect>
    </property>

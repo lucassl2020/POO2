@@ -30,7 +30,6 @@ class MainUi(QtWidgets.QWidget):
         self.QtStack.addWidget(self.stack1)
         self.QtStack.addWidget(self.stack2)
 
-        
 class Main(QtWidgets.QMainWindow, MainUi):
     def __init__(self, parent=None):
         super(Main, self).__init__(parent)

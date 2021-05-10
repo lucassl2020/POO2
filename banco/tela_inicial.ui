@@ -33,7 +33,7 @@
     <property name="frameShadow">
      <enum>QFrame::Raised</enum>
     </property>
-    <widget class="QPushButton" name="pushButton">
+    <widget class="QPushButton" name="cadastrar_se_botao">
      <property name="geometry">
       <rect>
        <x>160</x>
@@ -61,7 +61,7 @@ color: rgb(28, 17, 145);</string>
       <string>CADASTRE-SE</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_2">
+    <widget class="QPushButton" name="login_botao">
      <property name="geometry">
       <rect>
        <x>460</x>
@@ -89,7 +89,7 @@ color: rgb(28, 17, 145);</string>
       <string>LOGIN</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label">
+    <widget class="QLabel" name="LEBANK_label">
      <property name="geometry">
       <rect>
        <x>0</x>
