@@ -4,7 +4,7 @@ import sys
 
 class Window(QWidget):
 	def __init__(self, parent=None):
-		super(Window, self).__init__()
+		super(Window, self).__init__(parent)
 		self.set_setting()
 		self.create_widgets()
 

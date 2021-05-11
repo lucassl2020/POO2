@@ -47,6 +47,7 @@ class Tela_Principal(object):
         self.saldo_line.setStyleSheet("background-color: rgb(255, 255, 0);\n"
 "color: rgb(23, 14, 121);")
         self.saldo_line.setObjectName("saldo_line")
+        self.saldo_line.setEnabled(False)
         self.titular_label = QtWidgets.QLabel(self.frame)
         self.titular_label.setGeometry(QtCore.QRect(10, 30, 341, 21))
         font = QtGui.QFont()
