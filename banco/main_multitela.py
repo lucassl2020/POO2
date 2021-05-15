@@ -23,7 +23,6 @@ class Ui_Main(QtWidgets.QWidget):
 
         self.QtStack = QtWidgets.QStackedLayout()
 
-        self.stack0 = QtWidgets.QMainWindow()
         self.stack1 = QtWidgets.QMainWindow()
         self.stack2 = QtWidgets.QMainWindow()
         self.stack3 = QtWidgets.QMainWindow()
@@ -32,8 +31,7 @@ class Ui_Main(QtWidgets.QWidget):
         self.stack6 = QtWidgets.QMainWindow()
         self.stack7 = QtWidgets.QMainWindow()
 
-        self.tela_inicial = Tela_Inicial()
-        self.tela_inicial.setupUi(self.stack0)
+        self.tela_inicial = Tela_Inicial(self)
 
         self.tela_cadastro = Tela_Cadastro()
         self.tela_cadastro.setupUi(self.stack1)
@@ -56,7 +54,7 @@ class Ui_Main(QtWidgets.QWidget):
         self.tela_principal = Tela_Principal()
         self.tela_principal.setupUi(self.stack7)
 
-        self.QtStack.addWidget(self.stack0)
+        self.QtStack.addWidget(self.tela_inicial)
         self.QtStack.addWidget(self.stack1)
         self.QtStack.addWidget(self.stack2)
         self.QtStack.addWidget(self.stack3)
