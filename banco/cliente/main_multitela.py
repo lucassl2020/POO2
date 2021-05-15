@@ -3,9 +3,6 @@ import sys
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 
-from Banco import Banco
-from Cliente import Cliente
-from Conta import Conta
 from tela_inicial import Tela_Inicial
 from tela_de_cadastro import Tela_Cadastro
 from tela_de_depositar import Tela_Deposito
@@ -15,45 +12,36 @@ from tela_de_saque import Tela_Saque
 from tela_de_transferir import Tela_Transferencia
 from tela_principal import Tela_Principal
 
+from socket import socket, AF_INET, SOCK_STREAM
 
-class Ui_Main(QtWidgets.QWidget):
-    def setupUI(self, Main):
-        Main.setObjectName('Main')
-        Main.resize(800, 600)
 
-        self.QtStack = QtWidgets.QStackedLayout()
-
+class Main(QtWidgets.QStackedLayout):
+    def __init__(self, parent=None):
+        super(Main,self).__init__(parent)
         self.tela_inicial = Tela_Inicial()
-
         self.tela_cadastro = Tela_Cadastro()
-
         self.tela_depositar = Tela_Deposito()
-
         self.tela_extrato = Tela_Extrato()
-
         self.tela_login = Tela_Login()
-
         self.tela_saque = Tela_Saque()
-
         self.tela_transferir = Tela_Transferencia()
-
         self.tela_principal = Tela_Principal()
 
-        self.QtStack.addWidget(self.tela_inicial)
-        self.QtStack.addWidget(self.tela_cadastro)
-        self.QtStack.addWidget(self.tela_depositar)
-        self.QtStack.addWidget(self.tela_extrato)
-        self.QtStack.addWidget(self.tela_login)
-        self.QtStack.addWidget(self.tela_saque)
-        self.QtStack.addWidget(self.tela_transferir)
-        self.QtStack.addWidget(self.tela_principal)
+        self.addWidget(self.tela_inicial)
+        self.addWidget(self.tela_cadastro)
+        self.addWidget(self.tela_depositar)
+        self.addWidget(self.tela_extrato)
+        self.addWidget(self.tela_login)
+        self.addWidget(self.tela_saque)
+        self.addWidget(self.tela_transferir)
+        self.addWidget(self.tela_principal)
 
-class Main(QtWidgets.QMainWindow, Ui_Main):
-    def __init__(self, parent=None):
-        super(Main, self).__init__(parent)
-        self.setupUI(self)
+        self.set_connects()
+        self.connect_server()
 
-        self.banco = Banco()
+        self.conta = None
+
+    def set_connects(self):
         self.tela_inicial.cadastrar_se_botao.clicked.connect(self.cadastrarAbrirTela)
         self.tela_inicial.login_botao.clicked.connect(self.loginAbrirTela)
 
@@ -80,15 +68,24 @@ class Main(QtWidgets.QMainWindow, Ui_Main):
         self.tela_transferir.transferir_botao.clicked.connect(self.transferirSaldo)
         self.tela_transferir.buscar_botao.clicked.connect(self.buscarDestinatario)
 
+    def connect_server(self):
+        ip = 'localhost'
+        port = 8000
+        address = ((ip, port))
+
+        self.cliente_socket = socket(AF_INET, SOCK_STREAM)
+        self.cliente_socket.connect(address)
+
     def cadastrarAbrirTela(self):
         self.tela_cadastro.nome_line.setText('')
         self.tela_cadastro.sobrenome_line.setText('')
         self.tela_cadastro.cpf_line.setText('')
         self.tela_cadastro.senha_line.setText('')
-        self.QtStack.setCurrentIndex(1)
+
+        self.setCurrentIndex(1)
         
     def loginAbrirTela(self):
-        self.QtStack.setCurrentIndex(4)
+        self.setCurrentIndex(4)
 
     def cadastrarCliente(self):
         nome = self.tela_cadastro.nome_line.text()
@@ -97,31 +94,30 @@ class Main(QtWidgets.QMainWindow, Ui_Main):
         senha = self.tela_cadastro.senha_line.text()
 
         if nome != '' and sobrenome != '' and cpf != '' and senha != '':
-            if cpf not in self.banco.clientes:
-                cliente = Cliente(nome, sobrenome, cpf)
-                if self.banco.clienteCadastrar(cliente):
-                    conta = Conta(cliente, senha)
-                    if self.banco.contaCadastrar(conta):
-                        QMessageBox.information(None, "LEBANK", f"Cadastro feito com sucesso\n\nNumero da conta: {conta.numero}")
-                        self.QtStack.setCurrentIndex(0)                    
-                    else:
-                        QMessageBox.information(None, "LEBANK", "Falha ao cadastrar dados do cliente")
-                else:        
-                    QMessageBox.information(None, "LEBANK", "Falha ao cadastrar dados do cliente")
+            request = f"cadastrar_cliente {nome} {sobrenome} {cpf} {senha}"
+            self.cliente_socket.send(request.encode())
+            resposta = self.cliente_socket.recv(1024).decode()
+            resposta = resposta.split()
+            if resposta[0] == "True":
+                QMessageBox.information(None, "LEBANK", f"Cadastro feito com sucesso\n\nNumero da conta: " + resposta[1])
+                self.voltarTelaInicial()                  
             else:
-                QMessageBox.information(None, "LEBANK", "O cpf ja esta cadastrado")
+                QMessageBox.information(None, "LEBANK", "Falha ao cadastrar dados do cliente")
         else:
             QMessageBox.information(None, "LEBANK", "Preencha todos os campos")
 
     def voltarTelaInicial(self):
-        self.QtStack.setCurrentIndex(0)
+        self.setCurrentIndex(0)
 
     def logarCliente(self):
         numero_da_conta = self.tela_login.numero_da_conta_line.text()
         senha = self.tela_login.senha_line.text()
 
         if numero_da_conta != '' and senha != '':
-            if self.banco.login(numero_da_conta, senha):
+            self.cliente_socket.send(f"login {numero_da_conta} {senha}".encode())
+            resposta = self.cliente_socket.recv(1024).decode()
+            if resposta == "True":
+                self.conta = {"numero_da_conta": numero_da_conta, "senha": senha}
                 self.tela_login.numero_da_conta_line.setText('')
                 self.tela_login.senha_line.setText('')
                 self.entrarTelaPrincipal()
@@ -131,22 +127,27 @@ class Main(QtWidgets.QMainWindow, Ui_Main):
             QMessageBox.information(None, "LEBANK", "Preencha todos os campos")
 
     def entrarTelaPrincipal(self):
-        self.QtStack.setCurrentIndex(7)
-        self.tela_principal.titular_line.setText(self.banco.conta_atual.titular.nome + ' ' + self.banco.conta_atual.titular.sobrenome)
-        self.tela_principal.saldo_line.setText(str(self.banco.conta_atual.saldo))
+        self.setCurrentIndex(7)
+
+        request = "get_titular" + " " + str(self.conta["numero_da_conta"]) + " " + str(self.conta["senha"])
+        self.cliente_socket.send(request.encode())
+        resposta = self.cliente_socket.recv(1024).decode()
+
+        if resposta != "False":
+            self.tela_principal.titular_line.setText(resposta)
+
+        request = "get_saldo" + " " + str(self.conta["numero_da_conta"]) + " " + str(self.conta["senha"])
+        self.cliente_socket.send(request.encode())
+        resposta = self.cliente_socket.recv(1024).decode()
+
+        if resposta != "False":
+        	self.tela_principal.saldo_line.setText(resposta)
 
     def sairTelaPrincipal(self):
-        self.banco.conta_atual = None
-        self.QtStack.setCurrentIndex(4)
+        self.setCurrentIndex(4)
 
     def extratoAbrirTela(self):
-        self.tela_extrato.numero_line.setText('')
-        self.tela_extrato.titular_line.setText('')
-        self.tela_extrato.saldo_line.setText('')
-        self.tela_extrato.limite_line.setText('')
-        self.tela_extrato.historico_line.setText('')
-
-        self.QtStack.setCurrentIndex(3)
+        self.setCurrentIndex(3)
 
         self.tela_extrato.numero_line.setText(str(self.banco.conta_atual.numero))
         self.tela_extrato.titular_line.setText(self.banco.conta_atual.titular.nome + ' ' + self.banco.conta_atual.titular.sobrenome)
@@ -155,22 +156,28 @@ class Main(QtWidgets.QMainWindow, Ui_Main):
         self.tela_extrato.historico_line.setText(self.banco.conta_atual.extrato())
 
     def transferirAbrirTela(self):
+        self.setCurrentIndex(6)
+
         self.tela_transferir.saldo_line.setText(str(self.banco.conta_atual.saldo))
         self.tela_transferir.numero_da_conta_do_destinatario_line.setText('')
         self.tela_transferir.nome_do_destinatario_line.setText('')
         self.tela_transferir.cpf_do_destinatario_line.setText('')
         self.tela_transferir.valor_a_ser_transferido_line.setText('')
 
-        self.QtStack.setCurrentIndex(6)
-
     def sacarAbrirTela(self):
-        self.tela_saque.saldo_line.setText(str(self.banco.conta_atual.saldo))
+        self.setCurrentIndex(5)
+        
         self.tela_saque.valor_a_ser_sacado_line.setText('')
 
-        self.QtStack.setCurrentIndex(5)
+        self.cliente_socket.send(f"get_saldo {self.conta[numero_da_conta]} {self.conta[senha]}".encode())
+        resposta = self.cliente_socket.recv(1024).decode()
 
+        if resposta != "False":
+        	self.tela_saque.saldo_line.setText(resposta)
+        
     def saqueConfirmar(self):
         valor_a_ser_sacado = self.tela_saque.valor_a_ser_sacado_line.text()
+        
         try:
             if valor_a_ser_sacado != '':
                 if self.banco.conta_atual.saca(float(valor_a_ser_sacado.replace(',', '.'))):
@@ -187,7 +194,7 @@ class Main(QtWidgets.QMainWindow, Ui_Main):
         self.tela_depositar.saldo_line.setText(str(self.banco.conta_atual.saldo))
         self.tela_depositar.valor_a_ser_depositado_line.setText('')
 
-        self.QtStack.setCurrentIndex(2)
+        self.setCurrentIndex(2)
 
     def depositoConfirmar(self):
         valor_a_ser_depositado = self.tela_depositar.valor_a_ser_depositado_line.text()

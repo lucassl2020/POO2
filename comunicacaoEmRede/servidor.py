@@ -11,7 +11,7 @@ server_socket.listen(10)
 
 print('Aguardando conexao')
 
-con, cliente = server_socket.accept()
+
 
 print('Conectado')
 print('Aguardando mensagem')
@@ -26,6 +26,6 @@ while(True):
 	
 	enviar = input('Digite uma mensagem para enviar ao cliente: ')
 		
-	con.send(enviar.encode())
+	con.send(True)
 
 server_socket.close()
