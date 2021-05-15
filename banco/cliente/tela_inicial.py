@@ -1,11 +1,3 @@
-# -*- coding: utf-8 -*-
-
-# Form implementation generated from reading ui file 'tela_inicial.ui'
-#
-# Created by: PyQt5 UI code generator 5.9.2
-#
-# WARNING! All changes made in this file will be lost!
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
 
@@ -20,7 +12,7 @@ class Tela_Inicial(QtWidgets.QMainWindow):
     def settings(self):
         self.resize(800, 463)
         self.setWindowTitle("Inicio")
-        self.setStyleSheet("background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0.0681818 rgba(14, 8, 73, 255), stop:0.607955 rgba(28, 17, 145, 255));")
+        
 
     def set_font(self):
         self.font = QtGui.QFont()
@@ -46,6 +38,7 @@ class Tela_Inicial(QtWidgets.QMainWindow):
         self.LEBANK_label.setFont(self.font)
         
     def set_style(self):
+        self.setStyleSheet("background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0.0681818 rgba(14, 8, 73, 255), stop:0.607955 rgba(28, 17, 145, 255));")
         self.cadastrar_se_botao.setStyleSheet("background-color: rgb(255, 255, 0); color: rgb(28, 17, 145);")
         self.login_botao.setStyleSheet("background-color: rgb(255, 255, 0); color: rgb(28, 17, 145);")
         self.LEBANK_label.setStyleSheet("background-color: rgb(255, 255, 0); color: rgb(28, 17, 145); background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0.210227 rgba(255, 255, 0, 255), stop:0.778409 rgba(255, 255, 117, 255));")

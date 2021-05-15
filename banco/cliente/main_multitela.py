@@ -23,45 +23,30 @@ class Ui_Main(QtWidgets.QWidget):
 
         self.QtStack = QtWidgets.QStackedLayout()
 
-        self.stack1 = QtWidgets.QMainWindow()
-        self.stack2 = QtWidgets.QMainWindow()
-        self.stack3 = QtWidgets.QMainWindow()
-        self.stack4 = QtWidgets.QMainWindow()
-        self.stack5 = QtWidgets.QMainWindow()
-        self.stack6 = QtWidgets.QMainWindow()
-        self.stack7 = QtWidgets.QMainWindow()
-
-        self.tela_inicial = Tela_Inicial(self)
+        self.tela_inicial = Tela_Inicial()
 
         self.tela_cadastro = Tela_Cadastro()
-        self.tela_cadastro.setupUi(self.stack1)
 
         self.tela_depositar = Tela_Deposito()
-        self.tela_depositar.setupUi(self.stack2)
 
         self.tela_extrato = Tela_Extrato()
-        self.tela_extrato.setupUi(self.stack3)
 
         self.tela_login = Tela_Login()
-        self.tela_login.setupUi(self.stack4)
 
         self.tela_saque = Tela_Saque()
-        self.tela_saque.setupUi(self.stack5)
 
         self.tela_transferir = Tela_Transferencia()
-        self.tela_transferir.setupUi(self.stack6)
 
         self.tela_principal = Tela_Principal()
-        self.tela_principal.setupUi(self.stack7)
 
         self.QtStack.addWidget(self.tela_inicial)
-        self.QtStack.addWidget(self.stack1)
-        self.QtStack.addWidget(self.stack2)
-        self.QtStack.addWidget(self.stack3)
-        self.QtStack.addWidget(self.stack4)
-        self.QtStack.addWidget(self.stack5)
-        self.QtStack.addWidget(self.stack6)
-        self.QtStack.addWidget(self.stack7)
+        self.QtStack.addWidget(self.tela_cadastro)
+        self.QtStack.addWidget(self.tela_depositar)
+        self.QtStack.addWidget(self.tela_extrato)
+        self.QtStack.addWidget(self.tela_login)
+        self.QtStack.addWidget(self.tela_saque)
+        self.QtStack.addWidget(self.tela_transferir)
+        self.QtStack.addWidget(self.tela_principal)
 
 class Main(QtWidgets.QMainWindow, Ui_Main):
     def __init__(self, parent=None):
