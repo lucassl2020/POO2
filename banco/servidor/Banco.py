@@ -39,68 +39,71 @@ class Banco():
 			print("RUNNING SERVER...")
 
 			resposta = "False"
+			
+			try:
+				if self.recebe[0] == "cadastrar_cliente":
+					cliente = Cliente(self.recebe[1], self.recebe[2], self.recebe[3])
+					if self.clienteCadastrar(cliente):
+						if self.contaCadastrar(Conta(cliente, self.recebe[4])):
+							resposta = "True"
+							resposta += ","
+							resposta += str(Conta.qtd_de_contas())
 
-			if self.recebe[0] == "cadastrar_cliente":
-				cliente = Cliente(self.recebe[1], self.recebe[2], self.recebe[3])
-				if self.clienteCadastrar(cliente):
-					if self.contaCadastrar(Conta(cliente, self.recebe[4])):
+				elif self.recebe[0] == "login":
+					resposta = str(self.login(self.recebe[1], self.recebe[2]))
+
+				elif self.recebe[0] == "get_titular":
+					if self.contas[self.recebe[1]].senha == self.recebe[2]:
 						resposta = "True"
-						resposta += ","
-						resposta += str(Conta.qtd_de_contas())
+						resposta += ','
+						resposta += self.contas[self.recebe[1]].titular.nome
+						resposta += ' '
+						resposta += self.contas[self.recebe[1]].titular.sobrenome			
 
-			elif self.recebe[0] == "login":
-				resposta = str(self.login(self.recebe[1], self.recebe[2]))
+				elif self.recebe[0] == "get_saldo":
+					if self.contas[self.recebe[1]].senha == self.recebe[2]:
+						resposta = "True"
+						resposta += ','
+						resposta += str(self.contas[self.recebe[1]].saldo)
+				
+				elif self.recebe[0] == "get_limite":
+					if self.contas[self.recebe[1]].senha == self.recebe[2]:
+						resposta = 'True'
+						resposta += ','
+						resposta += str(self.contas[self.recebe[1]].limite)
+				
+				elif self.recebe[0] == "get_titular_cpf_destinatario":
+					try:
+						if self.contas[self.recebe[1]].senha == self.recebe[2]:
+							resposta = "True"
+							resposta += ","
+							resposta += self.contas[self.recebe[3]].titular.nome
+							resposta += ' '
+							resposta += self.contas[self.recebe[3]].titular.sobrenome
+							resposta += ','
+							resposta += self.contas[self.recebe[3]].titular.cpf[0:3]
+					except:
+						pass
 
-			elif self.recebe[0] == "get_titular":
-				if self.contas[self.recebe[1]].senha == self.recebe[2]:
-					resposta = "True"
-					resposta += ','
-					resposta += self.contas[self.recebe[1]].titular.nome
-					resposta += ' '
-					resposta += self.contas[self.recebe[1]].titular.sobrenome			
+				elif self.recebe[0] == "sacar":
+					if self.contas[self.recebe[1]].senha == self.recebe[2]:
+						resposta = str(self.contas[self.recebe[1]].saca(float(self.recebe[3])))
 
-			elif self.recebe[0] == "get_saldo":
-				if self.contas[self.recebe[1]].senha == self.recebe[2]:
-					resposta = "True"
-					resposta += ','
-					resposta += str(self.contas[self.recebe[1]].saldo)
-			
-			elif self.recebe[0] == "get_limite":
-				if self.contas[self.recebe[1]].senha == self.recebe[2]:
-					resposta = 'True'
-					resposta += ','
-					resposta += str(self.contas[self.recebe[1]].limite)
-			
-			elif self.recebe[0] == "get_titular_cpf_destinatario":
-				try:
+				elif self.recebe[0] == "depositar":
+					if self.contas[self.recebe[1]].senha == self.recebe[2]:
+						resposta = str(self.contas[self.recebe[1]].deposita(float(self.recebe[3])))
+
+				elif self.recebe[0] == "transferir":
+					if self.contas[self.recebe[1]].senha == self.recebe[2]:
+						resposta = str(self.contas[self.recebe[1]].transfere(self.contas[self.recebe[3]], float(self.recebe[4])))
+				
+				elif self.recebe[0] == "get_historico":
 					if self.contas[self.recebe[1]].senha == self.recebe[2]:
 						resposta = "True"
 						resposta += ","
-						resposta += self.contas[self.recebe[3]].titular.nome
-						resposta += ' '
-						resposta += self.contas[self.recebe[3]].titular.sobrenome
-						resposta += ','
-						resposta += self.contas[self.recebe[3]].titular.cpf[0:3]
-				except:
-					pass
-
-			elif self.recebe[0] == "sacar":
-				if self.contas[self.recebe[1]].senha == self.recebe[2]:
-					resposta = str(self.contas[self.recebe[1]].saca(float(self.recebe[3])))
-
-			elif self.recebe[0] == "depositar":
-				if self.contas[self.recebe[1]].senha == self.recebe[2]:
-					resposta = str(self.contas[self.recebe[1]].deposita(float(self.recebe[3])))
-
-			elif self.recebe[0] == "transferir":
-				if self.contas[self.recebe[1]].senha == self.recebe[2]:
-					resposta = str(self.contas[self.recebe[1]].transfere(self.contas[self.recebe[3]], float(self.recebe[4])))
-			
-			elif self.recebe[0] == "get_historico":
-				if self.contas[self.recebe[1]].senha == self.recebe[2]:
-					resposta = "True"
-					resposta += ","
-					resposta += self.contas[self.recebe[1]].extrato()
+						resposta += self.contas[self.recebe[1]].extrato()
+			except:
+				break
 
 			self.con.send(resposta.encode())
 
