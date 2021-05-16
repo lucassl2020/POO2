@@ -93,6 +93,7 @@ class Main(QtWidgets.QStackedLayout):
 
     def loginAbrirTela(self):
         self.setCurrentIndex(4)
+        self.conta = None
 
     def cadastrarCliente(self):
         nome = self.tela_cadastro.nome_line.text()
@@ -151,6 +152,7 @@ class Main(QtWidgets.QStackedLayout):
 
     def sairTelaPrincipal(self):
         self.setCurrentIndex(4)
+
 
     def extratoAbrirTela(self):
         self.setCurrentIndex(3)
