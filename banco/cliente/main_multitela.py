@@ -284,6 +284,9 @@ class Main(QtWidgets.QStackedLayout):
                 QMessageBox.information(None, "LEBANK", "Informe o numero da conta do destinatario")
         except:
             QMessageBox.information(None, "LEBANK", "Ocorreu um erro")
+            self.tela_transferir.nome_do_destinatario_line.setText('')
+            self.tela_transferir.cpf_do_destinatario_line.setText('')
+            
 
 
 if __name__ == '__main__':
