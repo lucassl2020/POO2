@@ -83,7 +83,7 @@ class Banco():
 							resposta += ','
 							resposta += self.contas[self.recebe[3]].titular.cpf[0:3]
 					except:
-						pass
+						resposta = "False"
 
 				elif self.recebe[0] == "sacar":
 					if self.contas[self.recebe[1]].senha == self.recebe[2]:

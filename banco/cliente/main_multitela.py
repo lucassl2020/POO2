@@ -273,15 +273,18 @@ class Main(QtWidgets.QStackedLayout):
 
         try:
             if numero_da_conta_do_destinatario != '':
+                print(resposta)
                 if resposta[0] == "True":
-                    self.tela_transferir.nome_do_destinatario_line.setText(
-                        resposta[1])
-                    self.tela_transferir.cpf_do_destinatario_line.setText(
-                        resposta[2] + '********')
+                    self.tela_transferir.nome_do_destinatario_line.setText(resposta[1])
+                    self.tela_transferir.cpf_do_destinatario_line.setText(resposta[2] + '********')
                 else:
                     QMessageBox.information(None, "LEBANK", "Destinatário não encontrado")
+                    self.tela_transferir.nome_do_destinatario_line.setText('')
+                    self.tela_transferir.cpf_do_destinatario_line.setText('')
             else:
                 QMessageBox.information(None, "LEBANK", "Informe o numero da conta do destinatario")
+                self.tela_transferir.nome_do_destinatario_line.setText('')
+                self.tela_transferir.cpf_do_destinatario_line.setText('')
         except:
             QMessageBox.information(None, "LEBANK", "Ocorreu um erro")
             self.tela_transferir.nome_do_destinatario_line.setText('')
