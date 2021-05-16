@@ -74,7 +74,7 @@ class Conta():
     
     def extrato(self):
         historico = ''
-        transacoes = self._historico.transacoes
+        transacoes = self.historico.transacoes
 
         for transacao in transacoes:
             historico += transacao
