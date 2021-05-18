@@ -33,7 +33,7 @@ class Tela_Inicial(QtWidgets.QMainWindow):
         self.LEBANK_label = QtWidgets.QLabel("LEBANK", self)
         self.LEBANK_label.setGeometry(QtCore.QRect(0, 0, 811, 20))
         self.LEBANK_label.setAlignment(QtCore.Qt.AlignCenter)
-        self.font.setFamily("Lucida Calligraphy")
+        self.font.setFamily("Arial")
         self.font.setPointSize(16)
         self.LEBANK_label.setFont(self.font)
         

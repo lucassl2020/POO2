@@ -15,7 +15,7 @@ class Tela_Extrato(QtWidgets.QMainWindow):
 
     def set_font(self):
         self.font = QtGui.QFont()
-        self.font.setFamily("Lucida Calligraphy")
+        self.font.setFamily("Arial")
         self.font.setPointSize(16)
 
     def create_widgets(self):
