@@ -112,7 +112,7 @@ class Banco():
 	def requestReceber(self):
 		request = self.con.recv(1024).decode()
 
-		return request.split()
+		return request.split(",")
 
 	def clienteCadastrar(self, cliente):
 		try:
