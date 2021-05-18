@@ -9,23 +9,27 @@ server_socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
 server_socket.bind(address)
 server_socket.listen(10)
 
-print('Aguardando conexao')
 
-
-
-print('Conectado')
-print('Aguardando mensagem')
-
-while(True):
-	recebe = con.recv(1024)
-	print('Mensagem recebida: ' + recebe.decode())
-
-	if recebe.decode() == 'EXIT':
-		con.send('EXIT'.encode())
+while True:
+	res = input('Sair ou continuar (s ou c)')
+	if res == "s":
 		break
-	
-	enviar = input('Digite uma mensagem para enviar ao cliente: ')
+
+	print('Aguardando conexao')
+	con, cliente = server_socket.accept()
+
+	print('\nConectado')
+	print('Aguardando mensagem\n')
+
+	while True:
+		recebe = con.recv(1024).decode()
+		print('Mensagem recebida: ' + recebe)
+
+		if recebe == 'EXIT':
+			break
 		
-	con.send(True)
+		enviar = input('Digite uma mensagem para enviar ao cliente: ')
+			
+		con.send(enviar.encode())
 
 server_socket.close()

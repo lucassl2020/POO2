@@ -7,18 +7,17 @@ address = ((ip, port))
 cliente_socket = socket(AF_INET, SOCK_STREAM)
 cliente_socket.connect(address)
 
-print('Envie a mensagem EXIT para desconectar do servidor')
 while(True):
 	mensagem = input('Digite uma mensagem para enviar ao servidor: ')
 	cliente_socket.send(mensagem.encode())
 	print('Mensagem enviada')
 
+	if mensagem == 'EXIT':
+		cliente_socket.send(mensagem.encode())
+		break
+
 	resposta = cliente_socket.recv(1024).decode()
 
-	if resposta == 'EXIT':
-		cliente_socket.send('EXIT'.encode())
-		break
-	else:
-		print(resposta)
+	print("Resposta: " + resposta)
 
 cliente_socket.close()
