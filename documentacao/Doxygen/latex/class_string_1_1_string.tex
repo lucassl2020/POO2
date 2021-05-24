@@ -1,0 +1,123 @@
+\hypertarget{class_string_1_1_string}{}\doxysection{Referência à classe String.\+String}
+\label{class_string_1_1_string}\index{String.String@{String.String}}
+\doxysubsection*{Membros públicos}
+\begin{DoxyCompactItemize}
+\item 
+def \mbox{\hyperlink{class_string_1_1_string_aadcc723bc69d7fd609461bd5c3b1d2bc}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self, \mbox{\hyperlink{class_string_1_1_string_a15f63e6005ab5b0c2bf08f6a395bc300}{string}})
+\item 
+def \mbox{\hyperlink{class_string_1_1_string_a15f63e6005ab5b0c2bf08f6a395bc300}{string}} (self)
+\item 
+def \mbox{\hyperlink{class_string_1_1_string_a225b818e4516cf8a2dc72e114ddf91c7}{string}} (self, string)
+\item 
+def \mbox{\hyperlink{class_string_1_1_string_a9a1c8dfc880858548a68fbb08de41f36}{concatenar}} (self, texto)
+\item 
+def \mbox{\hyperlink{class_string_1_1_string_a466f8b74305e8f70415ca8d9bd3c9c92}{tamanho}} (self)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Descrição detalhada}
+\begin{DoxyVerb}Classe responsavel por armazenar uma string e definir operações com ela
+
+    Atributos:
+        self._string: 
+            Descrição: String en que serão feitas as operações
+            Tipo: str\end{DoxyVerb}
+ 
+
+\doxysubsection{Documentação dos Construtores \& Destrutor}
+\mbox{\Hypertarget{class_string_1_1_string_aadcc723bc69d7fd609461bd5c3b1d2bc}\label{class_string_1_1_string_aadcc723bc69d7fd609461bd5c3b1d2bc}} 
+\index{String.String@{String.String}!\_\_init\_\_@{\_\_init\_\_}}
+\index{\_\_init\_\_@{\_\_init\_\_}!String.String@{String.String}}
+\doxysubsubsection{\texorpdfstring{\_\_init\_\_()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def String.\+String.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{string }\end{DoxyParamCaption})}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{13     \textcolor{keyword}{def }\_\_init\_\_(self, string):}
+\DoxyCodeLine{14         self.\_string = string}
+\DoxyCodeLine{15 }
+
+\end{DoxyCode}
+
+
+\doxysubsection{Documentação dos métodos}
+\mbox{\Hypertarget{class_string_1_1_string_a9a1c8dfc880858548a68fbb08de41f36}\label{class_string_1_1_string_a9a1c8dfc880858548a68fbb08de41f36}} 
+\index{String.String@{String.String}!concatenar@{concatenar}}
+\index{concatenar@{concatenar}!String.String@{String.String}}
+\doxysubsubsection{\texorpdfstring{concatenar()}{concatenar()}}
+{\footnotesize\ttfamily def String.\+String.\+concatenar (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{texto }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Une um texto a string separados por um espaço.
+
+        Parâmetros:
+            texto: 
+                Descrição: Texto que será unido a string
+                Tipo: str\end{DoxyVerb}
+ 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{24     \textcolor{keyword}{def }concatenar(self, texto):}
+\DoxyCodeLine{25         \textcolor{stringliteral}{"{}"{}"{}Une um texto a string separados por um espaço.}}
+\DoxyCodeLine{26 \textcolor{stringliteral}{}}
+\DoxyCodeLine{27 \textcolor{stringliteral}{        Parâmetros:}}
+\DoxyCodeLine{28 \textcolor{stringliteral}{            texto: }}
+\DoxyCodeLine{29 \textcolor{stringliteral}{                Descrição: Texto que será unido a string}}
+\DoxyCodeLine{30 \textcolor{stringliteral}{                Tipo: str}}
+\DoxyCodeLine{31 \textcolor{stringliteral}{        "{}"{}"{}}}
+\DoxyCodeLine{32         self.string += \textcolor{stringliteral}{"{} "{}} + texto}
+\DoxyCodeLine{33 }
+
+\end{DoxyCode}
+\mbox{\Hypertarget{class_string_1_1_string_a15f63e6005ab5b0c2bf08f6a395bc300}\label{class_string_1_1_string_a15f63e6005ab5b0c2bf08f6a395bc300}} 
+\index{String.String@{String.String}!string@{string}}
+\index{string@{string}!String.String@{String.String}}
+\doxysubsubsection{\texorpdfstring{string()}{string()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily def String.\+String.\+string (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{17     \textcolor{keyword}{def }string(self):}
+\DoxyCodeLine{18         \textcolor{keywordflow}{return} self.\_string}
+\DoxyCodeLine{19     }
+
+\end{DoxyCode}
+\mbox{\Hypertarget{class_string_1_1_string_a225b818e4516cf8a2dc72e114ddf91c7}\label{class_string_1_1_string_a225b818e4516cf8a2dc72e114ddf91c7}} 
+\index{String.String@{String.String}!string@{string}}
+\index{string@{string}!String.String@{String.String}}
+\doxysubsubsection{\texorpdfstring{string()}{string()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily def String.\+String.\+string (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{string }\end{DoxyParamCaption})}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{21     \textcolor{keyword}{def }string(self, string):}
+\DoxyCodeLine{22         self.\_string = string}
+\DoxyCodeLine{23 }
+
+\end{DoxyCode}
+\mbox{\Hypertarget{class_string_1_1_string_a466f8b74305e8f70415ca8d9bd3c9c92}\label{class_string_1_1_string_a466f8b74305e8f70415ca8d9bd3c9c92}} 
+\index{String.String@{String.String}!tamanho@{tamanho}}
+\index{tamanho@{tamanho}!String.String@{String.String}}
+\doxysubsubsection{\texorpdfstring{tamanho()}{tamanho()}}
+{\footnotesize\ttfamily def String.\+String.\+tamanho (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Calcula e retorna o tamanho da string que o objeto armazena
+        
+        Retorno: 
+            Descrição: Tamanho da string que o objeto armazena
+            Tipo: int\end{DoxyVerb}
+ 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{34     \textcolor{keyword}{def }tamanho(self):}
+\DoxyCodeLine{35         \textcolor{stringliteral}{"{}"{}"{}Calcula e retorna o tamanho da string que o objeto armazena}}
+\DoxyCodeLine{36 \textcolor{stringliteral}{        }}
+\DoxyCodeLine{37 \textcolor{stringliteral}{        Retorno: }}
+\DoxyCodeLine{38 \textcolor{stringliteral}{            Descrição: Tamanho da string que o objeto armazena}}
+\DoxyCodeLine{39 \textcolor{stringliteral}{            Tipo: int}}
+\DoxyCodeLine{40 \textcolor{stringliteral}{        "{}"{}"{}}}
+\DoxyCodeLine{41         \textcolor{keywordflow}{return} len(self.string)}
+
+\end{DoxyCode}
+
+
+A documentação para esta classe foi gerada a partir do seguinte ficheiro\+:\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{_string_8py}{String.\+py}}\end{DoxyCompactItemize}
