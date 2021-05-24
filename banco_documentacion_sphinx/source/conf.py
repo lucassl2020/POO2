@@ -12,14 +12,15 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../'))
+sys.path.insert(0, os.path.abspath('../Cliente'))
+sys.path.insert(1, os.path.abspath('../Servidor'))
 
 
 # -- Project information -----------------------------------------------------
 
 project = 'LEBANK'
 copyright = '2021, Eurico Delmondes & Lucas Silva Lopes'
-author = 'Francisco Jose & Mateus'
+author = 'Eurico Delmondes & Lucas Silva Lopes'
 
 # The full version, including alpha/beta/rc tags
 release = '1.0.1'
