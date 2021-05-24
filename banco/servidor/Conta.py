@@ -1,7 +1,25 @@
 from Historico import Historico
 
 class Conta():
-    
+    """
+
+    Classe responsavel pela criação de contas para o banco.
+
+    :ivar Conta._qtd_de_contas: Quantidade de contas criadas
+    :vartype Conta._qtd_de_contas: int
+    :ivar self._numero: Numero da conta correspondente a quantidade de contas criadas
+    :vartype self._numero: int
+    :ivar self._titular: O cliente criado
+    :vartype self._titular: Cliente Object
+    :ivar self._saldo: Saldo da conta
+    :vartype self._saldo: float
+    :ivar self._limite: Limite da conta
+    :vartype self._limite: float
+    :ivar self._historico: Historico da conta contendo as trasações realizadas
+    :vartype self._historico: Historico Object
+    :ivar self._senha: Senha de acesso para a conta
+    :vartype self._senha: str
+    """
     _qtd_de_contas = 0
     
     __slots__ = ['_numero', '_titular', '_saldo', '_limite', '_historico', '_senha']

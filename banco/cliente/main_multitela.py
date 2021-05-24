@@ -16,6 +16,7 @@ from socket import socket, AF_INET, SOCK_STREAM
 
 
 class Main(QtWidgets.QStackedLayout):
+
     def __init__(self, parent=None):
         super(Main, self).__init__(parent)
         self.tela_inicial = Tela_Inicial()
@@ -83,8 +84,22 @@ class Main(QtWidgets.QStackedLayout):
         self.tela_cadastro.senha_line.setText('')
 
         self.setCurrentIndex(1)
-    
+
     def requestEnviar(self, request):
+        '''
+
+        Envia ao servidor uma solicitação de serviço juntamente com as informações necessárias para a execução
+        da mesma, e aguarda a resposta.
+
+
+        :param request: A solicitação a ser enviada
+        :type request: str
+        :ivar resposta: A resposta da requisição feita
+
+        :returns: A resposta da requisição feita em forma de lista sendo a "," o separador.
+        :rtype: list
+        
+        '''
         self.cliente_socket.send(request.encode())
 
         resposta = self.cliente_socket.recv(1024).decode()
@@ -102,11 +117,11 @@ class Main(QtWidgets.QStackedLayout):
         senha = self.tela_cadastro.senha_line.text()
 
         if nome != '' and sobrenome != '' and cpf != '' and senha != '':
-        
+
             resposta = self.requestEnviar("cadastrar_cliente" + "," + nome + "," + sobrenome + "," + cpf + "," + senha)
 
             if resposta[0] == "True":
-                
+
                 QMessageBox.information(None, "LEBANK",
                                         f"Cadastro feito com sucesso\n\nNumero da conta: " + resposta[1])
                 self.voltarTelaInicial()
@@ -153,17 +168,20 @@ class Main(QtWidgets.QStackedLayout):
     def sairTelaPrincipal(self):
         self.setCurrentIndex(4)
 
-
     def extratoAbrirTela(self):
         self.setCurrentIndex(3)
 
-        resposta_titular = self.requestEnviar("get_titular" + "," + self.conta["numero_da_conta"] + "," + self.conta["senha"])
+        resposta_titular = self.requestEnviar(
+            "get_titular" + "," + self.conta["numero_da_conta"] + "," + self.conta["senha"])
 
-        resposta_saldo = self.requestEnviar("get_saldo" + "," + self.conta["numero_da_conta"] + "," + self.conta["senha"])
+        resposta_saldo = self.requestEnviar(
+            "get_saldo" + "," + self.conta["numero_da_conta"] + "," + self.conta["senha"])
 
-        resposta_limite = self.requestEnviar("get_limite" + "," + self.conta["numero_da_conta"] + "," + self.conta["senha"])
-        
-        resposta_historico = self.requestEnviar("get_historico" + "," + self.conta["numero_da_conta"] + "," + self.conta["senha"])
+        resposta_limite = self.requestEnviar(
+            "get_limite" + "," + self.conta["numero_da_conta"] + "," + self.conta["senha"])
+
+        resposta_historico = self.requestEnviar(
+            "get_historico" + "," + self.conta["numero_da_conta"] + "," + self.conta["senha"])
 
         self.tela_extrato.numero_line.setText(self.conta["numero_da_conta"])
 
@@ -186,7 +204,7 @@ class Main(QtWidgets.QStackedLayout):
 
         if resposta[0] == "True":
             self.tela_transferir.saldo_line.setText(resposta[1])
-            
+
         self.tela_transferir.numero_da_conta_do_destinatario_line.setText('')
         self.tela_transferir.nome_do_destinatario_line.setText('')
         self.tela_transferir.cpf_do_destinatario_line.setText('')
@@ -207,7 +225,8 @@ class Main(QtWidgets.QStackedLayout):
 
         try:
             if valor_a_ser_sacado != '':
-                resposta = self.requestEnviar("sacar" + "," + self.conta["numero_da_conta"] + "," + self.conta["senha"] + "," + valor_a_ser_sacado.replace(',', '.'))
+                resposta = self.requestEnviar("sacar" + "," + self.conta["numero_da_conta"] + "," + self.conta[
+                    "senha"] + "," + valor_a_ser_sacado.replace(',', '.'))
 
                 if resposta[0] == "True":
                     QMessageBox.information(None, "LEBANK", "Saque realizado com sucesso")
@@ -225,7 +244,7 @@ class Main(QtWidgets.QStackedLayout):
 
         if resposta[0] == "True":
             self.tela_depositar.saldo_line.setText(resposta[1])
-        
+
         self.tela_depositar.valor_a_ser_depositado_line.setText('')
 
         self.setCurrentIndex(2)
@@ -235,8 +254,9 @@ class Main(QtWidgets.QStackedLayout):
 
         try:
             if valor_a_ser_depositado != '':
-                resposta = self.requestEnviar("depositar" + "," + self.conta["numero_da_conta"] + "," + self.conta["senha"] + "," + valor_a_ser_depositado.replace(',', '.'))
- 
+                resposta = self.requestEnviar("depositar" + "," + self.conta["numero_da_conta"] + "," + self.conta[
+                    "senha"] + "," + valor_a_ser_depositado.replace(',', '.'))
+
                 if resposta[0] == "True":
                     QMessageBox.information(None, "LEBANK", "Deposito realizado com sucesso")
                     self.entrarTelaPrincipal()
@@ -254,7 +274,8 @@ class Main(QtWidgets.QStackedLayout):
         try:
             if numero_da_conta_do_destinatario != '' and valor_a_ser_transferido != '':
 
-                resposta = self.requestEnviar("transferir" + "," + self.conta["numero_da_conta"] + "," + self.conta["senha"] + "," + numero_da_conta_do_destinatario + "," + valor_a_ser_transferido.replace(',', '.'))
+                resposta = self.requestEnviar("transferir" + "," + self.conta["numero_da_conta"] + "," + self.conta[
+                    "senha"] + "," + numero_da_conta_do_destinatario + "," + valor_a_ser_transferido.replace(',', '.'))
 
                 if resposta[0] == "True":
                     QMessageBox.information(None, "LEBANK", "Transferencia realizada com sucesso\n")
@@ -269,7 +290,9 @@ class Main(QtWidgets.QStackedLayout):
     def buscarDestinatario(self):
         numero_da_conta_do_destinatario = self.tela_transferir.numero_da_conta_do_destinatario_line.text()
 
-        resposta = self.requestEnviar("get_titular_cpf_destinatario" + "," + self.conta["numero_da_conta"] + "," + self.conta["senha"] + "," + numero_da_conta_do_destinatario)
+        resposta = self.requestEnviar(
+            "get_titular_cpf_destinatario" + "," + self.conta["numero_da_conta"] + "," + self.conta[
+                "senha"] + "," + numero_da_conta_do_destinatario)
 
         try:
             if numero_da_conta_do_destinatario != '':
@@ -288,7 +311,6 @@ class Main(QtWidgets.QStackedLayout):
             QMessageBox.information(None, "LEBANK", "Ocorreu um erro")
             self.tela_transferir.nome_do_destinatario_line.setText('')
             self.tela_transferir.cpf_do_destinatario_line.setText('')
-            
 
 
 if __name__ == '__main__':
