@@ -1,6 +1,7 @@
 from socket import socket, AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
 from Conta import Conta
 from Cliente import Cliente
+import mysql.connector as mysql
 
 
 class Banco:
@@ -17,20 +18,12 @@ class Banco:
 
 	"""
 	def __init__(self):
-		self._clientes = {}
-		self._contas = {}
 		self.requests = {}
+
 		self.create_requests()
 		self.create_server()
+		self.create_bd()
 		self.start_server()
-
-	@property
-	def clientes(self):
-		return self._clientes
-
-	@property
-	def contas(self):
-		return self._contas
 
 	def create_server(self):
 		self.host = 'localhost'
@@ -57,7 +50,7 @@ class Banco:
 
 	def create_requests(self):
 		self.adicionar_request("cadastrar_cliente", self.cadastrarCliente)
-		self.adicionar_request("login", self.login)
+		self.adicionar_request("login", self.respostaAoLogin)
 		self.adicionar_request("get_titular", self.getTitular)
 		self.adicionar_request("get_saldo", self.getSaldo)
 		self.adicionar_request("get_limite", self.getLimite)
@@ -107,17 +100,71 @@ class Banco:
 
 		while(True):
 			request_name, request_parameters = self.requestReceber()
+			
+			func = self.requests[request_name]
 
-			try:
-				func = self.requests[request_name]
-
-				resposta = func(request_parameters)
-			except:
-				break
+			resposta = func(request_parameters)
 
 			self.con.send(resposta.encode())
 
 		self.server_socket.close()
+	
+	def applySqlCommand(self, sql_command, retorno=None):
+		conexao = mysql.connect(host="localhost", db="lebankDB", user="root", passwd="")
+
+		cursor = conexao.cursor()
+
+		cursor.execute(sql_command)
+
+		if retorno == "fetchall":
+			valor_return = cursor.fetchall()
+		elif retorno == "lastrowid":
+			valor_return = cursor.lastrowid 
+		else:
+			valor_return = None
+
+		conexao.commit()
+
+		conexao.close()
+
+		return valor_return
+
+	def create_bd(self):
+		self.applySqlCommand("SET default_storage_engine=InnoDB;")
+
+		sql_command = """CREATE TABLE IF NOT EXISTS Clientes(
+					id INTEGER AUTO_INCREMENT PRIMARY KEY UNIQUE,
+					nome TEXT NOT NULL, 
+					sobrenome TEXT NOT NULL,
+					cpf VARCHAR(11) NOT NULL UNIQUE
+				);"""
+		self.applySqlCommand(sql_command)
+
+		sql_command = """CREATE TABLE IF NOT EXISTS Contas(
+					numero INTEGER AUTO_INCREMENT PRIMARY KEY UNIQUE,
+					saldo FLOAT NOT NULL,
+					limite FLOAT NOT NULL,
+					senha VARCHAR(32) NOT NULL,
+					id_cliente INTEGER NOT NULL,
+					CONSTRAINT fk_cliente FOREIGN KEY (id_cliente) REFERENCES cliente (id)
+				);"""
+		self.applySqlCommand(sql_command)
+
+		sql_command = """CREATE TABLE IF NOT EXISTS Historicos(
+					id INTEGER AUTO_INCREMENT PRIMARY KEY UNIQUE,
+					operacao TEXT NOT NULL, 
+					id_conta INTEGER NOT NULL,
+					CONSTRAINT fk_conta FOREIGN KEY (id_conta) REFERENCES conta (id)
+				);"""
+		self.applySqlCommand(sql_command)
+
+	def cpfJaCadastrado(self, cpf):
+		listaCpfsEncontrados = self.applySqlCommand("SELECT * from Clientes WHERE cpf= '%s'" % (cpf), retorno="fetchall")
+
+		if listaCpfsEncontrados:
+			return True
+
+		return False
 
 	def cadastrarCliente(self, request_parameters):
 		"""
@@ -131,35 +178,33 @@ class Banco:
 
 		resposta = 'False'
 
-		cliente = Cliente(request_parameters[0], request_parameters[1], request_parameters[2])
+		nome = request_parameters[0]
+		sobrenome = request_parameters[1]
+		cpf = request_parameters[2]
+		senha = request_parameters[3]
 
-		if cliente.cpf not in self.clientes and cliente.cpf.isdigit() and len(cliente.cpf) == 11:
-			self.clientes[cliente.cpf] = cliente
+		if (not self.cpfJaCadastrado(cpf)) and cpf.isdigit() and len(cpf) == 11:
+			id_cliente = self.applySqlCommand("INSERT INTO Clientes (nome, sobrenome, cpf) VALUES ('%s','%s','%s')" % (nome, sobrenome, cpf), retorno="lastrowid")
 
-			if self.cadastrarConta(Conta(cliente, request_parameters[3])):
-				resposta = "True"
-				resposta += ","
-				resposta += str(Conta.qtd_de_contas())
+			id_conta = self.applySqlCommand("INSERT INTO Contas (saldo, limite, senha, id_cliente) VALUES (%s,%s,MD5('%s'),%s)" % (0.00, 1000.00, senha, id_cliente), retorno="lastrowid")
+
+			resposta = "True"
+			resposta += ","
+			resposta += str(id_conta)
+
+			print("Cliente cadastrado\n")
 
 		return resposta
 
-	def cadastrarConta(self, conta):
-		"""
+	def login(self, numero_da_conta, senha):
+		listaContasEncontradas = self.applySqlCommand("SELECT 1 from Contas WHERE numero= %s AND senha= MD5('%s')" % (numero_da_conta, senha), retorno="fetchall")
 
-		Adiciona a conta ao dicionario de contas, sendo a key o numero da conta.
+		if listaContasEncontradas:
+			return True
 		
-		:param conta: A respectiva conta do cliente
-		:type conta: Conta Object
-		:return: True se funcionar
-		:rtype: bool
-		
-		"""
-		print("Cadastrando conta")
+		return False
 
-		self.contas[conta.numero] = conta
-		return True
-
-	def login(self, request_parameters):
+	def respostaAoLogin(self, request_parameters):
 		"""
 
 		Verifica o login da conta por meio da sua senha cadastrada.
@@ -174,8 +219,15 @@ class Banco:
 
 		resposta = "False"
 
-		if self.contas[request_parameters[0]].senha == request_parameters[1]:
+		numero_da_conta = int(request_parameters[0])
+		senha = request_parameters[1]
+
+		if self.login(numero_da_conta, senha):
+			print("Logado com sucesso\n")
+
 			resposta = "True"
+		else:
+			print("Falha no login\n")
 
 		return resposta
 
@@ -189,16 +241,33 @@ class Banco:
 		:rtype: str
 
 		"""
-		print("Buscando e retornando titular")
+		print("Buscando titular de uma conta")
 
 		resposta = "False"
 
-		if self.contas[request_parameters[0]].senha == request_parameters[1]:
+		numero_da_conta = int(request_parameters[0])
+		senha = request_parameters[1]
+
+		if self.login(numero_da_conta, senha):
+			listaContasEncontradas = self.applySqlCommand("SELECT id_cliente from Contas WHERE numero= %s" % (numero_da_conta), retorno="fetchall")
+
+			conta_logada = listaContasEncontradas[0]
+			id_cliente = conta_logada[0]
+
+			listaClientesEncontrados = self.applySqlCommand("SELECT nome, sobrenome from Clientes WHERE id= %s" % (id_cliente), retorno="fetchall")
+
+			cliente_logado = listaClientesEncontrados[0]
+
+			nome = cliente_logado[0]
+			sobrenome = cliente_logado[1]
+
 			resposta = "True"
 			resposta += ','
-			resposta += self.contas[request_parameters[0]].titular.nome
+			resposta += nome
 			resposta += ' '
-			resposta += self.contas[request_parameters[0]].titular.sobrenome
+			resposta += sobrenome
+
+			print("Titular encontrado\n")
 
 		return resposta
 
@@ -212,14 +281,24 @@ class Banco:
 		:rtype: str
 
 		"""
-		print("Buscando e retornando saldo")
+		print("Buscando saldo de uma conta")
 
 		resposta = "False"
 
-		if self.contas[request_parameters[0]].senha == request_parameters[1]:
+		numero_da_conta = int(request_parameters[0])
+		senha = request_parameters[1]
+
+		if self.login(numero_da_conta, senha):
+			listaContasEncontradas = self.applySqlCommand("SELECT saldo from Contas WHERE numero= %s" % (numero_da_conta), retorno="fetchall")
+
+			conta_logada = listaContasEncontradas[0]
+			saldo = conta_logada[0]
+
 			resposta = "True"
 			resposta += ','
-			resposta += str(self.contas[request_parameters[0]].saldo)
+			resposta += str(saldo)
+
+			print("Saldo encontrado\n")
 
 		return resposta
 
@@ -233,14 +312,24 @@ class Banco:
 		:rtype: str
 
 		"""
-		print("Buscando e retornando limite")
+		print("Buscando limite de uma conta")
 
 		resposta = "False"
 
-		if self.contas[request_parameters[0]].senha == request_parameters[1]:
+		numero_da_conta = request_parameters[0]
+		senha = request_parameters[1]
+
+		if self.login(numero_da_conta, senha):
+			listaContasEncontradas = self.applySqlCommand("SELECT limite from Contas WHERE numero= %s" % (numero_da_conta), retorno="fetchall")
+
+			conta_logada = listaContasEncontradas[0]
+			limite = conta_logada[0]
+
 			resposta = 'True'
 			resposta += ','
-			resposta += str(self.contas[request_parameters[0]].limite)
+			resposta += str(limite)
+
+			print("Limite encontrado\n")
 
 		return resposta
 
@@ -258,10 +347,24 @@ class Banco:
 
 		resposta = "False"
 
-		if self.contas[request_parameters[0]].senha == request_parameters[1]:
+		numero_da_conta = int(request_parameters[0])
+		senha = request_parameters[1]
+
+		if self.login(numero_da_conta, senha):
+			listaContasEncontradas = self.applySqlCommand("SELECT numero from Contas WHERE numero= %s" % (numero_da_conta), retorno="fetchall")
+
+			conta_logada = listaContasEncontradas[0]
+			id_conta = conta_logada[0]
+
+			listaHistoricosEncontrados = self.applySqlCommand("SELECT operacao from Historicos WHERE id_conta= %s" % (id_conta), retorno="fetchall")
+
 			resposta = "True"
 			resposta += ","
-			resposta += self.contas[request_parameters[0]].extrato()
+
+			for historico in listaHistoricosEncontrados:
+				operacao = historico[0]
+
+				resposta += operacao
 
 		return resposta
 
@@ -275,21 +378,38 @@ class Banco:
 		:rtype: str
 		
 		"""
-		print("Buscando e retornando titular e cpf do destinatario")
+		print("Buscando titular e cpf do destinatario")
 
 		resposta = "False"
 
-		try:
-			if self.contas[request_parameters[0]].senha == request_parameters[1]:
-				resposta = "True"
-				resposta += ","
-				resposta += self.contas[request_parameters[2]].titular.nome
-				resposta += ' '
-				resposta += self.contas[request_parameters[2]].titular.sobrenome
-				resposta += ','
-				resposta += self.contas[request_parameters[2]].titular.cpf[0:3]
-		except:
-			pass
+		numero_da_conta = int(request_parameters[0])
+		senha = request_parameters[1]
+		numero_conta_destinatario = int(request_parameters[2])
+
+		if self.login(numero_da_conta, senha):
+			listaContasEncontradas = self.applySqlCommand("SELECT id_cliente from Contas WHERE numero= %s" % (numero_conta_destinatario), retorno="fetchall")
+
+			if listaContasEncontradas:
+				conta_logada = listaContasEncontradas[0]
+				id_cliente = conta_logada[0]
+
+				listaClientesEncontrados = self.applySqlCommand("SELECT nome, sobrenome, cpf from Clientes WHERE id= %s" % (id_cliente), retorno="fetchall")
+
+				if listaClientesEncontrados:
+					cliente_destinatario = listaClientesEncontrados[0]
+					nome = cliente_destinatario[0]
+					sobrenome =  cliente_destinatario[1]
+					cpf = cliente_destinatario[2]
+
+					resposta = "True"
+					resposta += ","
+					resposta += nome
+					resposta += ' '
+					resposta += sobrenome
+					resposta += ','
+					resposta += cpf[0:3]
+
+					print("Titular e cpf do destinatario encotrado\n")
 
 		return resposta
 
@@ -308,8 +428,32 @@ class Banco:
 
 		resposta = "False"
 
-		if self.contas[request_parameters[0]].senha == request_parameters[1]:
-			resposta = str(self.contas[request_parameters[0]].saca(float(request_parameters[2])))
+		numero_da_conta = int(request_parameters[0])
+		senha = request_parameters[1]
+		valor_a_ser_sacado = float(request_parameters[2])
+
+		if self.login(numero_da_conta, senha):
+			listaContasEncontradas = self.applySqlCommand("SELECT numero, saldo from Contas WHERE numero= %s" % (numero_da_conta), retorno="fetchall")
+
+			conta_logada = listaContasEncontradas[0]
+			id_conta = conta_logada[0]
+			saldo = conta_logada[1]
+
+			
+			if valor_a_ser_sacado > 0 and valor_a_ser_sacado <= saldo:
+				saldo -= valor_a_ser_sacado
+
+				self.applySqlCommand("UPDATE Contas SET saldo= %s WHERE numero= %s" % (saldo, id_conta))
+
+				operacao = "Saque no valor de " + str(valor_a_ser_sacado) + " reais\n\n"
+				self.applySqlCommand("INSERT INTO Historicos (operacao, id_conta) VALUES ('%s',%s)" % (operacao, id_conta))
+
+				resposta = "True"
+
+				print("Saque realizado com sucesso\n")
+			else:
+				print("Saque falhou\n")
+		
 
 		return resposta
 
@@ -327,8 +471,31 @@ class Banco:
 
 		resposta = "False"
 
-		if self.contas[request_parameters[0]].senha == request_parameters[1]:
-			resposta = str(self.contas[request_parameters[0]].deposita(float(request_parameters[2])))
+		numero_da_conta = int(request_parameters[0])
+		senha = request_parameters[1]
+		valor_a_ser_depositado = float(request_parameters[2])
+
+		if self.login(numero_da_conta, senha):
+			listaContasEncontradas = self.applySqlCommand("SELECT numero, saldo, limite from Contas WHERE numero= %s" % (numero_da_conta), retorno="fetchall")
+
+			conta_logada = listaContasEncontradas[0]
+			id_conta = conta_logada[0]
+			saldo = conta_logada[1]
+			limite = conta_logada[2]
+ 
+			if valor_a_ser_depositado > 0 and saldo + valor_a_ser_depositado <= limite:
+				saldo += valor_a_ser_depositado
+
+				self.applySqlCommand("UPDATE Contas SET saldo= %s WHERE numero= %s" % (saldo, id_conta))
+
+				operacao = "deposito no valor de " + str(valor_a_ser_depositado) + " reais\n\n"
+				self.applySqlCommand("INSERT INTO Historicos (operacao, id_conta) VALUES ('%s',%s)" % (operacao, id_conta))
+
+				resposta = "True"
+
+				print("deposito realizado com sucesso\n")
+			else:
+				print("deposito falhou\n")
 
 		return resposta
 
@@ -346,11 +513,57 @@ class Banco:
 		print("Realizando transferencia")
 
 		resposta = "False"
-		try:
-			if self.contas[request_parameters[0]].senha == request_parameters[1]:
-				resposta = str(self.contas[request_parameters[0]].transfere(self.contas[request_parameters[2]], float(request_parameters[3])))
-		except:
-			pass
+
+		numero_da_conta = int(request_parameters[0])
+		senha = request_parameters[1]
+		numero_conta_destinatario = int(request_parameters[2])
+		valor_a_ser_transferido = float(request_parameters[3])
+
+		if self.login(numero_da_conta, senha):
+			listaContasEncontradas = self.applySqlCommand("SELECT numero, saldo, id_cliente from Contas WHERE numero= %s" % (numero_da_conta), retorno="fetchall")
+
+			conta_logada = listaContasEncontradas[0]
+			id_conta = conta_logada[0]
+			saldo = conta_logada[1]
+			id_cliente = conta_logada[2]
+
+			listaContasEncontradasDestinatario = self.applySqlCommand("SELECT numero, saldo, limite, id_cliente from Contas WHERE numero= %s" % (numero_conta_destinatario), retorno="fetchall")
+
+			if listaContasEncontradasDestinatario:
+				conta_destinatario = listaContasEncontradasDestinatario[0]
+				id_conta_destinatario = conta_destinatario[0]
+				saldo_destinatario = conta_destinatario[1]
+				limite_destinatario = conta_destinatario[2]
+				id_cliente_destinatario = conta_destinatario[3]
+				
+			if id_conta != id_conta_destinatario:
+				if valor_a_ser_transferido > 0 and valor_a_ser_transferido <= saldo:
+					saldo -= valor_a_ser_transferido
+
+					if saldo_destinatario + valor_a_ser_transferido <= limite_destinatario:
+						saldo_destinatario += valor_a_ser_transferido 
+
+						self.applySqlCommand("UPDATE Contas SET saldo= %s WHERE numero= %s" % (saldo, id_conta))
+						self.applySqlCommand("UPDATE Contas SET saldo= %s WHERE numero= %s" % (saldo_destinatario, id_conta_destinatario))
+
+						listaClientesEncontrados = self.applySqlCommand("SELECT nome, sobrenome from Clientes WHERE id= %s" % (id_cliente_destinatario), retorno="fetchall")
+						cliente = listaClientesEncontrados[0]
+						nome_completo = cliente[0] + " " + cliente[1]
+
+						operacao = "Transferencia para " + nome_completo + " no valor de " + str(valor_a_ser_transferido) + " reais\n\n"
+						self.applySqlCommand("INSERT INTO Historicos (operacao, id_conta) VALUES ('%s',%s)" % (operacao, id_conta))
+
+						listaClientesEncontrados = self.applySqlCommand("SELECT nome, sobrenome from Clientes WHERE id= %s" % (id_cliente), retorno="fetchall")
+						cliente = listaClientesEncontrados[0]
+						nome_completo = cliente[0] + " " + cliente[1]
+
+						operacao = "Transferencia recebida de " + nome_completo + " no valor de " + str(valor_a_ser_transferido) + " reais\n\n"
+						self.applySqlCommand("INSERT INTO Historicos (operacao, id_conta) VALUES ('%s',%s)" % (operacao, id_conta_destinatario))
+
+						resposta = "True"
+
+						print("Transferencia realizada com sucesso\n")
+				print("Transferencia falhou\n")	
 
 		return resposta
 

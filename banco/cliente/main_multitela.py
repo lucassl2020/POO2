@@ -85,7 +85,7 @@ class Main(QtWidgets.QStackedLayout):
 
         self.setCurrentIndex(1)
 
-    def requestEnviar(self, request):
+    def enviarRequest(self, request):
         '''
 
         Envia ao servidor uma solicitação de serviço juntamente com as informações necessárias para a execução
@@ -118,12 +118,11 @@ class Main(QtWidgets.QStackedLayout):
 
         if nome != '' and sobrenome != '' and cpf != '' and senha != '':
 
-            resposta = self.requestEnviar("cadastrar_cliente" + "," + nome + "," + sobrenome + "," + cpf + "," + senha)
+            resposta = self.enviarRequest("cadastrar_cliente" + "," + nome + "," + sobrenome + "," + cpf + "," + senha)
 
             if resposta[0] == "True":
 
-                QMessageBox.information(None, "LEBANK",
-                                        f"Cadastro feito com sucesso\n\nNumero da conta: " + resposta[1])
+                QMessageBox.information(None, "LEBANK", "Cadastro feito com sucesso\n\nNumero da conta: " + resposta[1])
                 self.voltarTelaInicial()
 
             else:
@@ -140,7 +139,7 @@ class Main(QtWidgets.QStackedLayout):
         senha = self.tela_login.senha_line.text()
 
         if numero_da_conta != '' and senha != '':
-            resposta = self.requestEnviar("login" + "," + numero_da_conta + "," + senha)
+            resposta = self.enviarRequest("login" + "," + numero_da_conta + "," + senha)
 
             if resposta[0] == "True":
                 self.conta = {"numero_da_conta": numero_da_conta, "senha": senha}
@@ -155,12 +154,12 @@ class Main(QtWidgets.QStackedLayout):
     def entrarTelaPrincipal(self):
         self.setCurrentIndex(7)
 
-        resposta = self.requestEnviar("get_titular" + "," + self.conta["numero_da_conta"] + "," + self.conta["senha"])
+        resposta = self.enviarRequest("get_titular" + "," + self.conta["numero_da_conta"] + "," + self.conta["senha"])
 
         if resposta[0] == "True":
             self.tela_principal.titular_line.setText(resposta[1])
 
-        resposta = self.requestEnviar("get_saldo" + "," + self.conta["numero_da_conta"] + "," + self.conta["senha"])
+        resposta = self.enviarRequest("get_saldo" + "," + self.conta["numero_da_conta"] + "," + self.conta["senha"])
 
         if resposta[0] == "True":
             self.tela_principal.saldo_line.setText(resposta[1])
@@ -171,16 +170,16 @@ class Main(QtWidgets.QStackedLayout):
     def extratoAbrirTela(self):
         self.setCurrentIndex(3)
 
-        resposta_titular = self.requestEnviar(
+        resposta_titular = self.enviarRequest(
             "get_titular" + "," + self.conta["numero_da_conta"] + "," + self.conta["senha"])
 
-        resposta_saldo = self.requestEnviar(
+        resposta_saldo = self.enviarRequest(
             "get_saldo" + "," + self.conta["numero_da_conta"] + "," + self.conta["senha"])
 
-        resposta_limite = self.requestEnviar(
+        resposta_limite = self.enviarRequest(
             "get_limite" + "," + self.conta["numero_da_conta"] + "," + self.conta["senha"])
 
-        resposta_historico = self.requestEnviar(
+        resposta_historico = self.enviarRequest(
             "get_historico" + "," + self.conta["numero_da_conta"] + "," + self.conta["senha"])
 
         self.tela_extrato.numero_line.setText(self.conta["numero_da_conta"])
@@ -200,7 +199,7 @@ class Main(QtWidgets.QStackedLayout):
     def transferirAbrirTela(self):
         self.setCurrentIndex(6)
 
-        resposta = self.requestEnviar("get_saldo" + "," + self.conta["numero_da_conta"] + "," + self.conta["senha"])
+        resposta = self.enviarRequest("get_saldo" + "," + self.conta["numero_da_conta"] + "," + self.conta["senha"])
 
         if resposta[0] == "True":
             self.tela_transferir.saldo_line.setText(resposta[1])
@@ -215,7 +214,7 @@ class Main(QtWidgets.QStackedLayout):
 
         self.tela_saque.valor_a_ser_sacado_line.setText('')
 
-        resposta = self.requestEnviar("get_saldo" + "," + self.conta["numero_da_conta"] + "," + self.conta["senha"])
+        resposta = self.enviarRequest("get_saldo" + "," + self.conta["numero_da_conta"] + "," + self.conta["senha"])
 
         if resposta[0] == "True":
             self.tela_saque.saldo_line.setText(resposta[1])
@@ -225,7 +224,7 @@ class Main(QtWidgets.QStackedLayout):
 
         try:
             if valor_a_ser_sacado != '':
-                resposta = self.requestEnviar("sacar" + "," + self.conta["numero_da_conta"] + "," + self.conta[
+                resposta = self.enviarRequest("sacar" + "," + self.conta["numero_da_conta"] + "," + self.conta[
                     "senha"] + "," + valor_a_ser_sacado.replace(',', '.'))
 
                 if resposta[0] == "True":
@@ -240,7 +239,7 @@ class Main(QtWidgets.QStackedLayout):
 
     def depositarAbrirTela(self):
 
-        resposta = self.requestEnviar("get_saldo" + "," + self.conta["numero_da_conta"] + "," + self.conta["senha"])
+        resposta = self.enviarRequest("get_saldo" + "," + self.conta["numero_da_conta"] + "," + self.conta["senha"])
 
         if resposta[0] == "True":
             self.tela_depositar.saldo_line.setText(resposta[1])
@@ -254,7 +253,7 @@ class Main(QtWidgets.QStackedLayout):
 
         try:
             if valor_a_ser_depositado != '':
-                resposta = self.requestEnviar("depositar" + "," + self.conta["numero_da_conta"] + "," + self.conta[
+                resposta = self.enviarRequest("depositar" + "," + self.conta["numero_da_conta"] + "," + self.conta[
                     "senha"] + "," + valor_a_ser_depositado.replace(',', '.'))
 
                 if resposta[0] == "True":
@@ -274,7 +273,7 @@ class Main(QtWidgets.QStackedLayout):
         try:
             if numero_da_conta_do_destinatario != '' and valor_a_ser_transferido != '':
 
-                resposta = self.requestEnviar("transferir" + "," + self.conta["numero_da_conta"] + "," + self.conta[
+                resposta = self.enviarRequest("transferir" + "," + self.conta["numero_da_conta"] + "," + self.conta[
                     "senha"] + "," + numero_da_conta_do_destinatario + "," + valor_a_ser_transferido.replace(',', '.'))
 
                 if resposta[0] == "True":
@@ -290,7 +289,7 @@ class Main(QtWidgets.QStackedLayout):
     def buscarDestinatario(self):
         numero_da_conta_do_destinatario = self.tela_transferir.numero_da_conta_do_destinatario_line.text()
 
-        resposta = self.requestEnviar(
+        resposta = self.enviarRequest(
             "get_titular_cpf_destinatario" + "," + self.conta["numero_da_conta"] + "," + self.conta[
                 "senha"] + "," + numero_da_conta_do_destinatario)
 

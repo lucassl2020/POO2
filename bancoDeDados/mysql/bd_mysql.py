@@ -3,8 +3,11 @@ import mysql.connector as mysql
 conexao = mysql.connect(host = "localhost", db="testDB", user="root", passwd="")
 cursor = conexao.cursor()
 
-sql = """CREATE TABLE IF NOT EXISTS usuarios(id integer AUTO_INCREMENT PRIMARY KEY,
-         nome text NOT NULL,email text NOT NULL);"""
+sql = """CREATE TABLE IF NOT EXISTS usuarios(
+            id integer AUTO_INCREMENT PRIMARY KEY,
+            nome text NOT NULL,
+            email text NOT NULL
+         )ENGINE = innodb;"""
 
 nome = "lucas"
 email = "lucaslopes@gmail.com"
