@@ -10,7 +10,7 @@ sql = """CREATE TABLE IF NOT EXISTS usuarios(
         );"""
 
 nome = "lucas"
-email = "lucaslopes@gmail.com"
+email = " @gmail.com"
 
 cursor.execute(sql)
 for i in range(5):

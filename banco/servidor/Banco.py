@@ -146,7 +146,7 @@ class Banco:
 					limite FLOAT NOT NULL,
 					senha VARCHAR(32) NOT NULL,
 					id_cliente INTEGER NOT NULL,
-					CONSTRAINT fk_cliente FOREIGN KEY (id_cliente) REFERENCES cliente (id)
+					CONSTRAINT fk_cliente FOREIGN KEY (id_cliente) REFERENCES Clientes (id)
 				);"""
 		self.applySqlCommand(sql_command)
 
@@ -154,7 +154,7 @@ class Banco:
 					id INTEGER AUTO_INCREMENT PRIMARY KEY UNIQUE,
 					operacao TEXT NOT NULL, 
 					id_conta INTEGER NOT NULL,
-					CONSTRAINT fk_conta FOREIGN KEY (id_conta) REFERENCES conta (id)
+					CONSTRAINT fk_conta FOREIGN KEY (id_conta) REFERENCES Contas (numero)
 				);"""
 		self.applySqlCommand(sql_command)
 
@@ -536,34 +536,33 @@ class Banco:
 				limite_destinatario = conta_destinatario[2]
 				id_cliente_destinatario = conta_destinatario[3]
 				
-			if id_conta != id_conta_destinatario:
-				if valor_a_ser_transferido > 0 and valor_a_ser_transferido <= saldo:
-					saldo -= valor_a_ser_transferido
+				if id_conta != id_conta_destinatario:
+					if valor_a_ser_transferido > 0 and valor_a_ser_transferido <= saldo:
+						saldo -= valor_a_ser_transferido
 
-					if saldo_destinatario + valor_a_ser_transferido <= limite_destinatario:
-						saldo_destinatario += valor_a_ser_transferido 
+						if saldo_destinatario + valor_a_ser_transferido <= limite_destinatario:
+							saldo_destinatario += valor_a_ser_transferido 
 
-						self.applySqlCommand("UPDATE Contas SET saldo= %s WHERE numero= %s" % (saldo, id_conta))
-						self.applySqlCommand("UPDATE Contas SET saldo= %s WHERE numero= %s" % (saldo_destinatario, id_conta_destinatario))
+							self.applySqlCommand("UPDATE Contas SET saldo= %s WHERE numero= %s" % (saldo, id_conta))
+							self.applySqlCommand("UPDATE Contas SET saldo= %s WHERE numero= %s" % (saldo_destinatario, id_conta_destinatario))
 
-						listaClientesEncontrados = self.applySqlCommand("SELECT nome, sobrenome from Clientes WHERE id= %s" % (id_cliente_destinatario), retorno="fetchall")
-						cliente = listaClientesEncontrados[0]
-						nome_completo = cliente[0] + " " + cliente[1]
+							listaClientesEncontrados = self.applySqlCommand("SELECT nome, sobrenome from Clientes WHERE id= %s" % (id_cliente_destinatario), retorno="fetchall")
+							cliente = listaClientesEncontrados[0]
+							nome_completo = cliente[0] + " " + cliente[1]
 
-						operacao = "Transferencia para " + nome_completo + " no valor de " + str(valor_a_ser_transferido) + " reais\n\n"
-						self.applySqlCommand("INSERT INTO Historicos (operacao, id_conta) VALUES ('%s',%s)" % (operacao, id_conta))
+							operacao = "Transferencia para " + nome_completo + " no valor de " + str(valor_a_ser_transferido) + " reais\n\n"
+							self.applySqlCommand("INSERT INTO Historicos (operacao, id_conta) VALUES ('%s',%s)" % (operacao, id_conta))
 
-						listaClientesEncontrados = self.applySqlCommand("SELECT nome, sobrenome from Clientes WHERE id= %s" % (id_cliente), retorno="fetchall")
-						cliente = listaClientesEncontrados[0]
-						nome_completo = cliente[0] + " " + cliente[1]
+							listaClientesEncontrados = self.applySqlCommand("SELECT nome, sobrenome from Clientes WHERE id= %s" % (id_cliente), retorno="fetchall")
+							cliente = listaClientesEncontrados[0]
+							nome_completo = cliente[0] + " " + cliente[1]
 
-						operacao = "Transferencia recebida de " + nome_completo + " no valor de " + str(valor_a_ser_transferido) + " reais\n\n"
-						self.applySqlCommand("INSERT INTO Historicos (operacao, id_conta) VALUES ('%s',%s)" % (operacao, id_conta_destinatario))
+							operacao = "Transferencia recebida de " + nome_completo + " no valor de " + str(valor_a_ser_transferido) + " reais\n\n"
+							self.applySqlCommand("INSERT INTO Historicos (operacao, id_conta) VALUES ('%s',%s)" % (operacao, id_conta_destinatario))
 
-						resposta = "True"
+							resposta = "True"
 
-						print("Transferencia realizada com sucesso\n")
-				print("Transferencia falhou\n")	
+							print("Transferencia realizada com sucesso\n")
 
 		return resposta
 

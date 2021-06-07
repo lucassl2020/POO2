@@ -14,13 +14,14 @@ email = "lucaslopes@gmail.com"
 
 cursor.execute(sql)
 for i in range(5):
-    cursor.execute("INSERT INTO usuarios (nome, email) VALUES (%s,%s)", (nome, email))
+    cursor.execute("INSERT INTO usuarios (nome, email) VALUES ('%s','%s')" % (nome, email))
 
 cursor.execute("SELECT * from usuarios")
+a= cursor
+print(a)
 
 for c in cursor:
     print(c)
 
 conexao.commit()
 conexao.close()
-
