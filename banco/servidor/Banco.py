@@ -1,6 +1,4 @@
 from socket import socket, AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
-from Conta import Conta
-from Cliente import Cliente
 import mysql.connector as mysql
 
 
