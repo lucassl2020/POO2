@@ -164,6 +164,14 @@ class Banco:
 
 		return False
 
+	def login(self, numero_da_conta, senha):
+		listaContasEncontradas = self.applySqlCommand("SELECT 1 from Contas WHERE numero= %s AND senha= MD5('%s')" % (numero_da_conta, senha), retorno="fetchall")
+
+		if listaContasEncontradas:
+			return True
+		
+		return False
+
 	def cadastrarCliente(self, request_parameters):
 		"""
 
@@ -193,14 +201,6 @@ class Banco:
 			print("Cliente cadastrado\n")
 
 		return resposta
-
-	def login(self, numero_da_conta, senha):
-		listaContasEncontradas = self.applySqlCommand("SELECT 1 from Contas WHERE numero= %s AND senha= MD5('%s')" % (numero_da_conta, senha), retorno="fetchall")
-
-		if listaContasEncontradas:
-			return True
-		
-		return False
 
 	def respostaAoLogin(self, request_parameters):
 		"""
@@ -382,9 +382,14 @@ class Banco:
 
 		numero_da_conta = int(request_parameters[0])
 		senha = request_parameters[1]
-		numero_conta_destinatario = int(request_parameters[2])
 
-		if self.login(numero_da_conta, senha):
+		try:
+			numero_conta_destinatario = int(request_parameters[2])
+			flag = True
+		except:
+			flag = False
+
+		if self.login(numero_da_conta, senha) and flag:
 			listaContasEncontradas = self.applySqlCommand("SELECT id_cliente from Contas WHERE numero= %s" % (numero_conta_destinatario), retorno="fetchall")
 
 			if listaContasEncontradas:
@@ -428,9 +433,14 @@ class Banco:
 
 		numero_da_conta = int(request_parameters[0])
 		senha = request_parameters[1]
-		valor_a_ser_sacado = float(request_parameters[2])
 
-		if self.login(numero_da_conta, senha):
+		try:
+			valor_a_ser_sacado = float(request_parameters[2])
+			flag = True
+		except:
+			flag = False
+
+		if self.login(numero_da_conta, senha) and flag:
 			listaContasEncontradas = self.applySqlCommand("SELECT numero, saldo from Contas WHERE numero= %s" % (numero_da_conta), retorno="fetchall")
 
 			conta_logada = listaContasEncontradas[0]
@@ -471,9 +481,14 @@ class Banco:
 
 		numero_da_conta = int(request_parameters[0])
 		senha = request_parameters[1]
-		valor_a_ser_depositado = float(request_parameters[2])
 
-		if self.login(numero_da_conta, senha):
+		try:
+			valor_a_ser_depositado = float(request_parameters[2])
+			flag = True
+		except:
+			flag = False
+
+		if self.login(numero_da_conta, senha) and flag:
 			listaContasEncontradas = self.applySqlCommand("SELECT numero, saldo, limite from Contas WHERE numero= %s" % (numero_da_conta), retorno="fetchall")
 
 			conta_logada = listaContasEncontradas[0]
@@ -514,10 +529,15 @@ class Banco:
 
 		numero_da_conta = int(request_parameters[0])
 		senha = request_parameters[1]
-		numero_conta_destinatario = int(request_parameters[2])
-		valor_a_ser_transferido = float(request_parameters[3])
 
-		if self.login(numero_da_conta, senha):
+		try:
+			numero_conta_destinatario = int(request_parameters[2])
+			valor_a_ser_transferido = float(request_parameters[3])
+			flag = True
+		except:
+			flag = False
+
+		if self.login(numero_da_conta, senha) and flag:
 			listaContasEncontradas = self.applySqlCommand("SELECT numero, saldo, id_cliente from Contas WHERE numero= %s" % (numero_da_conta), retorno="fetchall")
 
 			conta_logada = listaContasEncontradas[0]
