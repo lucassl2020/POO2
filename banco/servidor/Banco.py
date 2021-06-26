@@ -1,5 +1,61 @@
 from socket import socket, AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
 import mysql.connector as mysql
+import threading
+
+
+requests = {}
+
+
+def requestReceber(clientsock):
+	"""
+
+	Recebe o request enviado pelo cliente decodifica ele, e depois transforma em lista
+	sendo o separador a ",".
+
+	:ivar request: Mensagem decodificada
+	:vartype request: str
+	:ivar request_list: Mensagem em formato de lista
+	:vartype request_list: list
+
+	:return: O primeiro indice(o nome da função do request) e seus parametros necessarios para a realização da mesmo)
+
+	"""
+	request = clientsock.recv(1024).decode()
+
+	request_list = request.split(",")
+
+	return request_list[0], request_list[1:]
+
+
+class ClientThread(threading.Thread):
+
+	_contador = 0
+
+	def __init__(self, clientAddress, clientsocket):
+		threading.Thread.__init__(self)
+
+		self.clientsocket = clientsocket
+		self.clientAddress = clientAddress
+		self.id = ClientThread._contador
+		self.sinc = threading.Lock()
+
+		ClientThread._contador += 1
+
+		print("Nova conexao: ", self.clientAddress)
+
+	def run(self):
+		while True:
+			request_name , request_parameters = requestReceber(self.clientsocket)
+			
+			self.sinc.acquire()
+
+			func = requests[request_name]
+
+			self.sinc.release()
+
+			resposta = func(request_parameters)
+
+			self.clientsocket.send(resposta.encode())
 
 
 class Banco:
@@ -16,22 +72,10 @@ class Banco:
 
 	"""
 	def __init__(self):
-		self.requests = {}
-
 		self.create_requests()
 		self.create_server()
 		self.create_bd()
 		self.start_server()
-
-	def create_server(self):
-		self.host = 'localhost'
-		self.port = 8000
-		self.address = (self.host, self.port)
-
-		self.server_socket = socket(AF_INET, SOCK_STREAM)
-		self.server_socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-		self.server_socket.bind(self.address)
-		self.server_socket.listen(10)
 
 	def adicionar_request(self, request_name, request_func):
 		"""
@@ -44,7 +88,7 @@ class Banco:
 		:type request_func: func
 
 		"""
-		self.requests[request_name] = request_func
+		requests[request_name] = request_func
 
 	def create_requests(self):
 		self.adicionar_request("cadastrar_cliente", self.cadastrarCliente)
@@ -57,26 +101,17 @@ class Banco:
 		self.adicionar_request("sacar", self.sacar)
 		self.adicionar_request("depositar", self.depositar)
 		self.adicionar_request("transferir", self.transferir)
+		self.adicionar_request("sair", self.sair)
 
-	def requestReceber(self):
-		"""
+	def create_server(self):
+		host = 'localhost'
+		port = 8000
+		address = (host, port)
 
-		Recebe o request enviado pelo cliente decodifica ele, e depois transforma em lista
-		sendo o separador a ",".
-
-		:ivar request: Mensagem decodificada
-		:vartype request: str
-		:ivar request_list: Mensagem em formato de lista
-		:vartype request_list: list
-
-		:return: O primeiro indice(o nome da função do request) e seus parametros necessarios para a realização da mesmo)
-
-		"""
-		request = self.con.recv(1024).decode()
-
-		request_list = request.split(",")
-
-		return request_list[0], request_list[1:]
+		self.server_socket = socket(AF_INET, SOCK_STREAM)
+		self.server_socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+		self.server_socket.bind(address)
+		self.server_socket.listen(1)
 
 	def start_server(self):
 		"""
@@ -94,21 +129,17 @@ class Banco:
 		"""
 		print("START SERVER...")
 
-		self.con, self.cliente = self.server_socket.accept()
-
 		while(True):
-			request_name, request_parameters = self.requestReceber()
-			
-			func = self.requests[request_name]
+			clientsock, clientAddress = self.server_socket.accept()
 
-			resposta = func(request_parameters)
+			novo_cliente = ClientThread(clientAddress, clientsock)
 
-			self.con.send(resposta.encode())
+			novo_cliente.start()
 
 		self.server_socket.close()
 	
 	def applySqlCommand(self, sql_command, retorno=None):
-		conexao = mysql.connect(host="localhost", db="lebankDB", user="root", passwd="")
+		conexao = mysql.connect(host="localhost", db="lebankDB", user="root", passwd="sh40l1nm4t4d0rdeporco")
 
 		cursor = conexao.cursor()
 
@@ -144,6 +175,7 @@ class Banco:
 					limite FLOAT NOT NULL,
 					senha VARCHAR(32) NOT NULL,
 					id_cliente INTEGER NOT NULL,
+					is_online BIT NOT NULL,
 					CONSTRAINT fk_cliente FOREIGN KEY (id_cliente) REFERENCES Clientes (id)
 				);"""
 		self.applySqlCommand(sql_command)
@@ -188,11 +220,12 @@ class Banco:
 		sobrenome = request_parameters[1]
 		cpf = request_parameters[2]
 		senha = request_parameters[3]
+		false = 0
 
 		if (not self.cpfJaCadastrado(cpf)) and cpf.isdigit() and len(cpf) == 11:
 			id_cliente = self.applySqlCommand("INSERT INTO Clientes (nome, sobrenome, cpf) VALUES ('%s','%s','%s')" % (nome, sobrenome, cpf), retorno="lastrowid")
 
-			id_conta = self.applySqlCommand("INSERT INTO Contas (saldo, limite, senha, id_cliente) VALUES (%s,%s,MD5('%s'),%s)" % (0.00, 1000.00, senha, id_cliente), retorno="lastrowid")
+			id_conta = self.applySqlCommand("INSERT INTO Contas (saldo, limite, senha, id_cliente, is_online) VALUES (%s,%s,MD5('%s'),%s, %s)" % (0.00, 1000.00, senha, id_cliente, false), retorno="lastrowid")
 
 			resposta = "True"
 			resposta += ","
@@ -217,13 +250,28 @@ class Banco:
 
 		resposta = "False"
 
-		numero_da_conta = int(request_parameters[0])
+		try:
+			numero_da_conta = int(request_parameters[0])
+		except:
+			print("Falha no login\n")
+			return resposta
+
 		senha = request_parameters[1]
 
 		if self.login(numero_da_conta, senha):
-			print("Logado com sucesso\n")
+			lista = self.applySqlCommand("SELECT is_online FROM Contas WHERE numero = %s" % (numero_da_conta), "fetchall")
+			is_online = lista[0][0]
+			
+			print(is_online)
 
-			resposta = "True"
+			if not is_online:
+				print("Logado com sucesso\n")
+
+				true = 1
+
+				self.applySqlCommand("UPDATE Contas SET is_online = %s WHERE numero = %s" % (true, numero_da_conta))
+
+				resposta = "True"
 		else:
 			print("Falha no login\n")
 
@@ -581,6 +629,23 @@ class Banco:
 							resposta = "True"
 
 							print("Transferencia realizada com sucesso\n")
+
+		return resposta
+
+	def sair(self, request_parameters):
+		print("Cliente saindo")
+
+		resposta = "False"
+
+		numero_da_conta = int(request_parameters[0])
+		senha = request_parameters[1]
+
+		if self.login(numero_da_conta, senha):
+			false = 0
+
+			self.applySqlCommand("UPDATE Contas SET is_online = %s WHERE numero = %s" % (false, numero_da_conta))
+
+			reposta = "True"
 
 		return resposta
 

@@ -95,6 +95,8 @@ class Tela_Transferencia(QtWidgets.QMainWindow):
         self.cpf_do_destinatario_label.setStyleSheet("background-color: rgb(255, 255, 255);")
         self.transferir_botao.setStyleSheet("background-color: rgb(255, 255, 0);")
 
+    def closeEvent(self, e):
+        e.ignore()
 
 if __name__ == '__main__':
     root = QtWidgets.QApplication(sys.argv)

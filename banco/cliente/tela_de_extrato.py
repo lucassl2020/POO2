@@ -82,6 +82,9 @@ class Tela_Extrato(QtWidgets.QMainWindow):
         self.limite_label.setStyleSheet("background-color: rgb(255, 255, 255);")
         self.historico_label.setStyleSheet("background-color: rgb(255, 255, 255);")
 
+    def closeEvent(self, e):
+        e.ignore()
+
 if __name__ == '__main__':
     root = QtWidgets.QApplication(sys.argv)
     app = Tela_Extrato()

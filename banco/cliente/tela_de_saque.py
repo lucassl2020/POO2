@@ -66,6 +66,9 @@ class Tela_Saque(QtWidgets.QMainWindow):
         self.confirmar_botao.setStyleSheet("background-color: rgb(255, 255, 0);")
         self.voltar_botao.setStyleSheet("background-color: rgb(255, 255, 0);")
 
+    def closeEvent(self, e):
+        e.ignore()
+
 
 if __name__ == '__main__':
     root = QtWidgets.QApplication(sys.argv)

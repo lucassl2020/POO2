@@ -86,7 +86,8 @@ class Tela_Principal(QtWidgets.QMainWindow):
         self.depositar_botao.setStyleSheet("background-color: rgb(255, 255, 0); color: rgb(28, 17, 145);")
         self.sair_botao.setStyleSheet("background-color: rgb(255, 255, 0); color: rgb(28, 17, 145);")
 
-
+    def closeEvent(self, e):
+        e.ignore()
 
 if __name__ == '__main__':
     root = QtWidgets.QApplication(sys.argv)

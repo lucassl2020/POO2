@@ -63,6 +63,8 @@ class Tela_Deposito(QtWidgets.QMainWindow):
         self.saldo_label.setStyleSheet("background-color: rgb(255, 255, 0); color: rgb(19, 11, 98);")
         self.saldo_line.setStyleSheet("background-color: rgb(255, 255, 0); color: rgb(23, 14, 121);")
 
+    def closeEvent(self, e):
+        e.ignore()
 
 if __name__ == '__main__':
     root = QtWidgets.QApplication(sys.argv)

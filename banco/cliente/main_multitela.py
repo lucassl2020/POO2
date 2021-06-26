@@ -165,7 +165,9 @@ class Main(QtWidgets.QStackedLayout):
             self.tela_principal.saldo_line.setText(resposta[1])
 
     def sairTelaPrincipal(self):
-        self.setCurrentIndex(4)
+        resposta = self.enviarRequest("sair" + "," + self.conta["numero_da_conta"] + "," + self.conta["senha"])
+
+        self.loginAbrirTela()
 
     def extratoAbrirTela(self):
         self.setCurrentIndex(3)
