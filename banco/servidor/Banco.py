@@ -44,18 +44,21 @@ class ClientThread(threading.Thread):
 		print("Nova conexao: ", self.clientAddress)
 
 	def run(self):
-		while True:
-			request_name , request_parameters = requestReceber(self.clientsocket)
-			
-			self.sinc.acquire()
+		try:
+			while True:
+				request_name , request_parameters = requestReceber(self.clientsocket)
+				
+				self.sinc.acquire()
 
-			func = requests[request_name]
+				func = requests[request_name]
 
-			self.sinc.release()
+				self.sinc.release()
 
-			resposta = func(request_parameters)
+				resposta = func(request_parameters)
 
-			self.clientsocket.send(resposta.encode())
+				self.clientsocket.send(resposta.encode())
+		except:
+			print("\nCLIENTE DESCONECTOU OU DEU ERRO '-'")
 
 
 class Banco:
@@ -139,7 +142,7 @@ class Banco:
 		self.server_socket.close()
 	
 	def applySqlCommand(self, sql_command, retorno=None):
-		conexao = mysql.connect(host="localhost", db="lebankDB", user="root", passwd="sh40l1nm4t4d0rdeporco")
+		conexao = mysql.connect(host="localhost", db="lebankDB", user="root", passwd="")
 
 		cursor = conexao.cursor()
 
@@ -262,7 +265,7 @@ class Banco:
 			lista = self.applySqlCommand("SELECT is_online FROM Contas WHERE numero = %s" % (numero_da_conta), "fetchall")
 			is_online = lista[0][0]
 			
-			print(is_online)
+			print("CLiente online: {}\n".format(bool(is_online)))
 
 			if not is_online:
 				print("Logado com sucesso\n")
@@ -410,7 +413,7 @@ class Banco:
 			for historico in listaHistoricosEncontrados:
 				operacao = historico[0]
 
-				resposta += operacao
+				resposta += operacao + "\n\n"
 
 		return resposta
 
@@ -501,7 +504,7 @@ class Banco:
 
 				self.applySqlCommand("UPDATE Contas SET saldo= %s WHERE numero= %s" % (saldo, id_conta))
 
-				operacao = "Saque no valor de " + str(valor_a_ser_sacado) + " reais\n\n"
+				operacao = "Saque no valor de " + str(valor_a_ser_sacado) + " reais"
 				self.applySqlCommand("INSERT INTO Historicos (operacao, id_conta) VALUES ('%s',%s)" % (operacao, id_conta))
 
 				resposta = "True"
@@ -549,7 +552,7 @@ class Banco:
 
 				self.applySqlCommand("UPDATE Contas SET saldo= %s WHERE numero= %s" % (saldo, id_conta))
 
-				operacao = "deposito no valor de " + str(valor_a_ser_depositado) + " reais\n\n"
+				operacao = "deposito no valor de " + str(valor_a_ser_depositado) + " reais"
 				self.applySqlCommand("INSERT INTO Historicos (operacao, id_conta) VALUES ('%s',%s)" % (operacao, id_conta))
 
 				resposta = "True"
@@ -616,14 +619,14 @@ class Banco:
 							cliente = listaClientesEncontrados[0]
 							nome_completo = cliente[0] + " " + cliente[1]
 
-							operacao = "Transferencia para " + nome_completo + " no valor de " + str(valor_a_ser_transferido) + " reais\n\n"
+							operacao = "Transferencia para " + nome_completo + " no valor de " + str(valor_a_ser_transferido) + " reais"
 							self.applySqlCommand("INSERT INTO Historicos (operacao, id_conta) VALUES ('%s',%s)" % (operacao, id_conta))
 
 							listaClientesEncontrados = self.applySqlCommand("SELECT nome, sobrenome from Clientes WHERE id= %s" % (id_cliente), retorno="fetchall")
 							cliente = listaClientesEncontrados[0]
 							nome_completo = cliente[0] + " " + cliente[1]
 
-							operacao = "Transferencia recebida de " + nome_completo + " no valor de " + str(valor_a_ser_transferido) + " reais\n\n"
+							operacao = "Transferencia recebida de " + nome_completo + " no valor de " + str(valor_a_ser_transferido) + " reais"
 							self.applySqlCommand("INSERT INTO Historicos (operacao, id_conta) VALUES ('%s',%s)" % (operacao, id_conta_destinatario))
 
 							resposta = "True"

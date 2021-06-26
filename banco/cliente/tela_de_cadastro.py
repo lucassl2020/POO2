@@ -58,8 +58,6 @@ class Tela_Cadastro(QtWidgets.QMainWindow):
         self.cpf_line = QtWidgets.QLineEdit(self.frame)
         self.cpf_line.setGeometry(QtCore.QRect(210, 170, 391, 20))
 
-        self.confirmar_botao = QtWidgets.QPushButton("CONFIRMAR", self.frame)
-        self.confirmar_botao.setGeometry(QtCore.QRect(150, 280, 211, 51))
         
         self.senha_label = QtWidgets.QLabel("Senha:", self.frame)
         self.senha_label.setGeometry(QtCore.QRect(130, 210, 51, 31))
@@ -68,6 +66,9 @@ class Tela_Cadastro(QtWidgets.QMainWindow):
         self.senha_line = QtWidgets.QLineEdit(self.frame)
         self.senha_line.setGeometry(QtCore.QRect(210, 220, 391, 20))
  
+        self.confirmar_botao = QtWidgets.QPushButton("CONFIRMAR", self.frame)
+        self.confirmar_botao.setGeometry(QtCore.QRect(150, 280, 211, 51))
+        
         self.voltar_botao = QtWidgets.QPushButton("VOLTAR", self.frame)
         self.voltar_botao.setGeometry(QtCore.QRect(460, 280, 211, 51))
 
