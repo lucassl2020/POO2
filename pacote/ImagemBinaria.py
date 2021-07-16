@@ -108,7 +108,7 @@ class ImagemBinaria():
 	def salvar(self, path):
 		img = self.imagem_binaria * 255
 
-		cv.imwrite(path, self.imagem_binaria)
+		cv.imwrite(path, img)
 
 	def __str__(self):
 		return self.imagem_binaria.__str__()
