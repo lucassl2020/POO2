@@ -105,6 +105,11 @@ class ImagemBinaria():
 
 		cv.destroyAllWindows()
 
+	def salvar(self, path):
+		img = self.imagem_binaria * 255
+
+		cv.imwrite(path, self.imagem_binaria)
+
 	def __str__(self):
 		return self.imagem_binaria.__str__()
 
