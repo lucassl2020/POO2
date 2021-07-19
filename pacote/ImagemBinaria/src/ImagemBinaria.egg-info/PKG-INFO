@@ -1,0 +1,111 @@
+Metadata-Version: 2.1
+Name: ImagemBinaria
+Version: 0.0.7
+Summary: Operations with Binary Images.
+Home-page: https://github.com/lucassl2020/POO2/tree/master/pacote
+Author: Eurico Delmondes, Lucas Silva Lopes
+Author-email: lucaslopes072009@hotmail.com
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.0
+Description-Content-Type: text/markdown
+License-File: LICENSE.txt
+
+ImagemBinaria
+=============
+
+#### Esse é um pacote que faz operações com imagens binarias!
+#### Imagem normal:
+
+![Imagem de entrada.](https://raw.githubusercontent.com/lucassl2020/POO2/master/pacote/imgs/flor.jpg)
+
+## Instalação:
+
+    pip install ImagemBinaria
+
+## Usos:
+### Tranformando em binaria:
+```
+from ImagemBinaria.ImagemBinaria import *
+
+teste = ImagemBinaria('../imgs/flor.jpg')
+
+teste.mostrar()
+```
+![Imagem de entrada.](https://raw.githubusercontent.com/lucassl2020/POO2/master/pacote/imgs/flor_binaria.jpg)
+
+### Rotacionando a Imagem em 90 graus:
+```
+from ImagemBinaria.ImagemBinaria import *
+
+teste = ImagemBinaria('../imgs/flor.jpg')
+
+teste.rotacao(90, True)
+
+teste.mostrar()
+```
+![Imagem de entrada.](https://raw.githubusercontent.com/lucassl2020/POO2/master/pacote/imgs/flor_rotacao.jpg)
+
+### Deslocando a Imagem 100 pixels para baixo e 100 pixels para a direita:
+```
+from ImagemBinaria.ImagemBinaria import *
+
+teste = ImagemBinaria('../imgs/flor.jpg')
+
+teste.translacao(100, 100, True)
+
+teste.mostrar()
+```
+![Imagem de entrada.](https://raw.githubusercontent.com/lucassl2020/POO2/master/pacote/imgs/flor_translacao.jpg)
+
+### Dilatando a imagem com kernel de 9x9:
+```
+from ImagemBinaria.ImagemBinaria import *
+
+teste = ImagemBinaria('../imgs/flor.jpg')
+
+teste.dilatacao(9, True)
+
+teste.mostrar()
+```
+![Imagem de entrada.](https://raw.githubusercontent.com/lucassl2020/POO2/master/pacote/imgs/flor_dilatacao.jpg)
+
+### Causando erosão na imagem com kernel de 6x6:
+```
+from ImagemBinaria.ImagemBinaria import *
+
+teste = ImagemBinaria('../imgs/flor.jpg')
+
+teste.erosao(6, True)
+
+teste.mostrar()
+```
+![Imagem de entrada.](https://raw.githubusercontent.com/lucassl2020/POO2/master/pacote/imgs/flor_erosao.jpg)
+
+### Causando abertura na imagem com kernel de 6x6:
+```
+from ImagemBinaria.ImagemBinaria import *
+
+teste = ImagemBinaria('../imgs/flor.jpg')
+
+teste.abertura(6, True)
+
+teste.mostrar()
+```
+![Imagem de entrada.](https://raw.githubusercontent.com/lucassl2020/POO2/master/pacote/imgs/flor_abertura.jpg)
+
+### Causando fechamento na imagem com kernel de 6x6:
+```
+from ImagemBinaria.ImagemBinaria import *
+
+teste = ImagemBinaria('../imgs/flor.jpg')
+
+teste.fechamento(6, True)
+
+teste.mostrar()
+```
+![Imagem de entrada.](https://raw.githubusercontent.com/lucassl2020/POO2/master/pacote/imgs/flor_fechamento.jpg)
+
